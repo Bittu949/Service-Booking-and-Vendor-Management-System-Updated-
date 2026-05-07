@@ -6,10 +6,7 @@ import com.sqts.sbvms.Service.ServiceCategoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,6 +34,17 @@ public class ServiceCategoryController {
                         true,
                         "Services found.",
                         serviceCategoryService.displayServices(),
+                        LocalDateTime.now()),
+                HttpStatus.OK);
+    }
+    @PutMapping("/services/{id}")
+    public ResponseEntity<ApiResponse<ServiceCategory>> updateService(@PathVariable Long id,
+                                                                      @RequestBody ServiceCategory updatedService){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Service updated.",
+                        serviceCategoryService.updateService(id, updatedService),
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }

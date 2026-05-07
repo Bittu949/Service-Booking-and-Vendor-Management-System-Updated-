@@ -7,6 +7,7 @@ import com.sqts.sbvms.Repository.ServiceCategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ServiceCategoryService {
@@ -24,5 +25,17 @@ public class ServiceCategoryService {
         if(services.isEmpty())
             throw new NoServiceFoundException("No service found.");
         return services;
+    }
+    public ServiceCategory updateService(Long id, ServiceCategory updatedService){
+        Optional<ServiceCategory> serviceOpt = serviceCategoryRepository.findById(id);
+        if(serviceOpt.isEmpty())
+            throw new NoServiceFoundException("No service found");
+        ServiceCategory service = serviceOpt.get();
+        if(updatedService.getServiceName()!=null && !updatedService.getServiceName().isEmpty())
+            service.setServiceName(updatedService.getServiceName());
+        if(updatedService.getDescription()!=null && !updatedService.getDescription().isEmpty())
+            service.setDescription(updatedService.getDescription());
+        serviceCategoryRepository.save(service);
+        return service;
     }
 }
