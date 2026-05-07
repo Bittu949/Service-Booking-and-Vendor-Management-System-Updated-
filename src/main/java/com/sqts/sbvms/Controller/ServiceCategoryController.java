@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 public class ServiceCategoryController {
@@ -28,5 +29,15 @@ public class ServiceCategoryController {
                         serviceCategoryService.createService(service),
                         LocalDateTime.now()),
                 HttpStatus.CREATED);
+    }
+    @GetMapping("/services")
+    public ResponseEntity<ApiResponse<List<ServiceCategory>>> displayServices(){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Services found.",
+                        serviceCategoryService.displayServices(),
+                        LocalDateTime.now()),
+                HttpStatus.OK);
     }
 }
