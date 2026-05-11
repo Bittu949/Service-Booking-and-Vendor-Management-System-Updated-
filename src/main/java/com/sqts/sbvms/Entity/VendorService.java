@@ -11,6 +11,13 @@ import lombok.Setter;
 import java.time.Duration;
 
 @Entity
+@Table(
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        columnNames = {"vendor_id", "service_category_id"}
+                )
+        }
+)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -21,6 +28,7 @@ public class VendorService {
     private Long id;
     @ManyToOne
     @NotNull
+    @JoinColumn(name = "vendor_id")
     Vendor vendor;
     @ManyToOne
     @JoinColumn(name = "service_category_id")

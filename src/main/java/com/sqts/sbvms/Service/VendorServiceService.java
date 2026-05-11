@@ -1,9 +1,6 @@
 package com.sqts.sbvms.Service;
 
-import com.sqts.sbvms.Dto.DisplayVendorDetails;
-import com.sqts.sbvms.Dto.VendorCreationRequest;
-import com.sqts.sbvms.Dto.VendorCreationResponse;
-import com.sqts.sbvms.Dto.VendorServiceDetails;
+import com.sqts.sbvms.Dto.*;
 import com.sqts.sbvms.Entity.ServiceCategory;
 import com.sqts.sbvms.Entity.User;
 import com.sqts.sbvms.Entity.Vendor;
@@ -64,6 +61,36 @@ public class VendorServiceService {
         response.setRole(user.getRole());
         response.setVendorId(vendor.getId());
 
+        return response;
+    }
+    @Transactional
+    public ServiceAssignmentResponse assignServiceToVendor(ServiceAssignmentRequest request) {
+        if(request == null)
+            throw new InvalidInputException("Please fill all the fields.");
+
+        Vendor vendor = vendorRepository.findById(request.getVendorId())
+                .orElseThrow(() ->
+                        new VendorNotFoundException("Vendor not found."));
+
+        ServiceCategory serviceCategory = serviceCategoryRepository.findById(request.getServiceCategoryId())
+                .orElseThrow(() ->
+                        new ServiceNotFoundException("Service not found."));
+
+        if(vendorServiceRepository.existsByVendorIdAndServiceCategoryId(request.getVendorId(), request.getServiceCategoryId()))
+            throw new DuplicateServiceAssignmentException("Provided service already mapped to this vendor.");
+
+        VendorService vendorService = new VendorService();
+        vendorService.setVendor(vendor);
+        vendorService.setServiceCategory(serviceCategory);
+        vendorService.setPrice(request.getPrice());
+        vendorService.setDuration(request.getDuration());
+        vendorServiceRepository.save(vendorService);
+
+        ServiceAssignmentResponse response = new ServiceAssignmentResponse();
+        response.setVendorId(vendor.getId());
+        response.setServiceCategoryName(serviceCategory.getServiceName());
+        response.setPrice(request.getPrice());
+        response.setDuration(request.getDuration());
         return response;
     }
     public DisplayVendorDetails displayVendor(Long id) {

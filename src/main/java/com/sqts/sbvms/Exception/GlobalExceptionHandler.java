@@ -164,4 +164,14 @@ public class GlobalExceptionHandler {
                         LocalDateTime.now()),
                 HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(DuplicateServiceAssignmentException.class)
+    public ResponseEntity<ApiResponse<Object>> handleDuplicateServiceAssignmentException(DuplicateServiceAssignmentException ex){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        false,
+                        ex.getMessage(),
+                        null,
+                        LocalDateTime.now()),
+                HttpStatus.BAD_REQUEST);
+    }
 }

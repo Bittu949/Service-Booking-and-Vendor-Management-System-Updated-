@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface VendorServiceRepository extends JpaRepository<VendorService, Long> {
     List<VendorService> findByVendorId(Long id);
+    boolean existsByVendorIdAndServiceCategoryId(Long vendorId, Long serviceCategoryId);
 }

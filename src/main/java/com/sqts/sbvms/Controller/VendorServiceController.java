@@ -1,9 +1,6 @@
 package com.sqts.sbvms.Controller;
 
-import com.sqts.sbvms.Dto.ApiResponse;
-import com.sqts.sbvms.Dto.DisplayVendorDetails;
-import com.sqts.sbvms.Dto.VendorCreationRequest;
-import com.sqts.sbvms.Dto.VendorCreationResponse;
+import com.sqts.sbvms.Dto.*;
 import com.sqts.sbvms.Entity.User;
 import com.sqts.sbvms.Entity.Vendor;
 import com.sqts.sbvms.Service.VendorServiceService;
@@ -27,6 +24,16 @@ public class VendorServiceController {
                         true,
                         "Vendor created successfully.",
                         vendorServiceService.createVendor(request),
+                        LocalDateTime.now()),
+                HttpStatus.CREATED);
+    }
+    @PostMapping("/vendor/assignService")
+    public ResponseEntity<ApiResponse<ServiceAssignmentResponse>> assignServiceToVendor(@Valid @RequestBody ServiceAssignmentRequest request){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Service assigned to vendor successfully.",
+                        vendorServiceService.assignServiceToVendor(request),
                         LocalDateTime.now()),
                 HttpStatus.CREATED);
     }
