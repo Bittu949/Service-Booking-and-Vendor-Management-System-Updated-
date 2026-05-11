@@ -16,8 +16,5 @@ public class VendorCreationResponse {
     private Long vendorId;
     private String name;
     private String email;
-    private String serviceName;
-    private Long price;
-    private Duration duration;
     private Role role;
 }

@@ -47,8 +47,6 @@ public class VendorServiceService {
         if(userRepository.existsByEmail(request.getEmail().trim()))
             throw new UserAlreadyExistsException("Email already registered.");
 
-        ServiceCategory serviceCategory = serviceCategoryRepository.findByServiceNameIgnoreCase(request.getServiceName().trim()).orElseThrow(() -> new ServiceNotFoundException("Provided service not found."));
-
         User user = new User();
         user.setName(request.getName().trim());
         user.setEmail(request.getEmail().trim());
@@ -60,21 +58,11 @@ public class VendorServiceService {
         vendor.setUser(user);
         vendorRepository.save(vendor);
 
-        VendorService vendorService = new VendorService();
-        vendorService.setVendor(vendor);
-        vendorService.setServiceCategory(serviceCategory);
-        vendorService.setDuration(request.getDuration());
-        vendorService.setPrice(request.getPrice());
-        vendorServiceRepository.save(vendorService);
-
         VendorCreationResponse response = new VendorCreationResponse();
         response.setName(user.getName());
         response.setEmail(user.getEmail());
         response.setRole(user.getRole());
         response.setVendorId(vendor.getId());
-        response.setServiceName(serviceCategory.getServiceName());
-        response.setPrice(vendorService.getPrice());
-        response.setDuration(vendorService.getDuration());
 
         return response;
     }

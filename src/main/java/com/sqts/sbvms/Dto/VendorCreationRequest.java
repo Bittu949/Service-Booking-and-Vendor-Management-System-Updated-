@@ -23,11 +23,4 @@ public class VendorCreationRequest {
     private String email;
     @NotBlank
     private String password;
-    @NotBlank
-    private String serviceName;
-    @NotNull
-    @Positive
-    Long price;
-    @NotNull
-    Duration duration;
 }
