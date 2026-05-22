@@ -117,8 +117,17 @@ public class VendorServiceService {
         displayVendorDetails.setVendorServiceDetails(serviceDetails);
         return displayVendorDetails;
     }
-    public VendorUpdateResponse updateVendor(VendorUpdateRequest request){
+    public VendorUpdateResponse updateVendor(Long vendorId, VendorUpdateRequest request){
+        Vendor vendor = vendorRepository.findById(vendorId)
+                .orElseThrow(() -> new VendorNotFoundException("Vendor not found."));
+        vendor.getUser().setName(request.getVendorName());
+        vendor.getUser().setEmail(request.getVendorEmail());
+        vendor.getUser().setPassword(request.getPassword());
+        vendorRepository.save(vendor);
         VendorUpdateResponse response = new VendorUpdateResponse();
+        response.setVendorId(vendor.getId());
+        response.setVendorName(vendor.getUser().getName());
+        response.setVendorEmail(vendor.getUser().getEmail());
         return response;
     }
 }

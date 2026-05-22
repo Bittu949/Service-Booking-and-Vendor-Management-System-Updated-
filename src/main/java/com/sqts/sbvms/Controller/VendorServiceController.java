@@ -47,13 +47,14 @@ public class VendorServiceController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
-    @PutMapping("/vendor")
-    public ResponseEntity<ApiResponse<VendorUpdateResponse>> updateVendor(@Valid @RequestBody VendorUpdateRequest request){
+    @PutMapping("/vendor/{id}")
+    public ResponseEntity<ApiResponse<VendorUpdateResponse>> updateVendor(@PathVariable(name = "id") Long vendorId,
+                                                                          @Valid @RequestBody VendorUpdateRequest request){
         return new ResponseEntity<>(
                 new ApiResponse<>(
                         true,
                         "Vendor updated successfully.",
-                        vendorServiceService.updateVendor(request),
+                        vendorServiceService.updateVendor(vendorId, request),
                         LocalDateTime.now()),
                 HttpStatus.CREATED);
     }
