@@ -44,4 +44,8 @@ public class ServiceCategoryService {
         serviceCategoryRepository.delete(serviceCategory);
         return serviceCategory;
     }
+    public ServiceCategory getSingleServices(Long serviceId){
+        return serviceCategoryRepository.findById(serviceId)
+                .orElseThrow(() -> new NoServiceFoundException("Service not found."));
+    }
 }

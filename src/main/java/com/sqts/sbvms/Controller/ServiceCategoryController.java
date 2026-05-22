@@ -58,4 +58,14 @@ public class ServiceCategoryController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
+    @GetMapping("/services/{id}")
+    public ResponseEntity<ApiResponse<ServiceCategory>> getSingleServices(@PathVariable(name = "id") Long serviceId){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Service found.",
+                        serviceCategoryService.getSingleServices(serviceId),
+                        LocalDateTime.now()),
+                HttpStatus.OK);
+    }
 }
