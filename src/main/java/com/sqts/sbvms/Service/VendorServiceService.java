@@ -12,7 +12,6 @@ import com.sqts.sbvms.Repository.UserRepository;
 import com.sqts.sbvms.Repository.VendorRepository;
 import com.sqts.sbvms.Repository.VendorServiceRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -21,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class VendorServiceService {
     private final VendorRepository vendorRepository;
     private final UserRepository userRepository;
@@ -35,7 +35,6 @@ public class VendorServiceService {
         this.serviceCategoryRepository = serviceCategoryRepository;
         this.vendorServiceRepository = vendorServiceRepository;
     }
-    @Transactional
     public VendorCreationResponse createVendor(VendorCreationRequest request){
         if(request == null)
             throw new InvalidInputException("Please fill all the details.");
@@ -63,7 +62,6 @@ public class VendorServiceService {
 
         return response;
     }
-    @Transactional
     public ServiceAssignmentResponse assignServiceToVendor(ServiceAssignmentRequest request) {
         if(request == null)
             throw new InvalidInputException("Please fill all the fields.");
@@ -128,6 +126,14 @@ public class VendorServiceService {
         response.setVendorId(vendor.getId());
         response.setVendorName(vendor.getUser().getName());
         response.setVendorEmail(vendor.getUser().getEmail());
+        return response;
+    }
+    public VendorDeletionResponse deleteVendor(Long vendorId){
+        Vendor vendor = vendorRepository.findById(vendorId).orElseThrow(() -> new VendorNotFoundException("Vendor not found."));
+        VendorDeletionResponse response = new VendorDeletionResponse();
+        response.setVendorName(vendor.getUser().getName());
+        response.setVendorEmail(vendor.getUser().getEmail());
+        vendorRepository.delete(vendor);
         return response;
     }
 }

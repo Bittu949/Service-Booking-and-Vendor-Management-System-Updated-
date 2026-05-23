@@ -56,6 +56,16 @@ public class VendorServiceController {
                         "Vendor updated successfully.",
                         vendorServiceService.updateVendor(vendorId, request),
                         LocalDateTime.now()),
-                HttpStatus.CREATED);
+                HttpStatus.OK);
+    }
+    @DeleteMapping("/vendor/{id}")
+    public ResponseEntity<ApiResponse<VendorDeletionResponse>> deleteVendor(@PathVariable(name = "id") long vendorId){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Vendor deleted successfully.",
+                        vendorServiceService.deleteVendor(vendorId),
+                        LocalDateTime.now()),
+                HttpStatus.OK);
     }
 }
