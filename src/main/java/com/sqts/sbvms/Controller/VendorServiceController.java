@@ -48,6 +48,16 @@ public class VendorServiceController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
+    @GetMapping("/vendor/{id}/services")
+    public ResponseEntity<ApiResponse<DisplayVendorDetails>> viewAssignedServices(@PathVariable(name = "id") Long id){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Data found.",
+                        vendorServiceService.viewAssignedServices(id),
+                        LocalDateTime.now()),
+                HttpStatus.OK);
+    }
     @GetMapping("/vendor/{id}")
     public ResponseEntity<ApiResponse<DisplayVendorDetails>> displayVendor(@PathVariable Long id){
         return new ResponseEntity<>(

@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -113,6 +112,22 @@ public class VendorServiceService {
             vendorDetailsList.add(vendorDetails);
         }
         return vendorDetailsList;
+    }
+    public DisplayVendorDetails viewAssignedServices(Long id){
+        Vendor vendor = vendorRepository.findById(id).orElseThrow(() -> new VendorNotFoundException("Vendor not found."));
+        DisplayVendorDetails displayVendorDetails = new DisplayVendorDetails();
+        List<VendorServiceDetails> vendorServiceDetailsList = new ArrayList<>();
+        displayVendorDetails.setVendorName(vendor.getUser().getName());
+        displayVendorDetails.setVendorEmail(vendor.getUser().getEmail());
+        for(VendorService service : vendor.getVendorServices()){
+            VendorServiceDetails vendorServiceDetails = new VendorServiceDetails();
+            vendorServiceDetails.setPrice(service.getPrice());
+            vendorServiceDetails.setDuration(service.getDuration());
+            vendorServiceDetails.setServiceCategory(service.getServiceCategory());
+            vendorServiceDetailsList.add(vendorServiceDetails);
+        }
+        displayVendorDetails.setVendorServiceDetails(vendorServiceDetailsList);
+        return displayVendorDetails;
     }
     public DisplayVendorDetails displayVendor(Long id) {
         Vendor vendor = vendorRepository.findById(id).orElseThrow(() -> new NoVendorFoundException("Vendor not found"));
