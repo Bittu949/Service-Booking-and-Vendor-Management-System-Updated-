@@ -91,6 +91,29 @@ public class VendorServiceService {
         response.setDuration(request.getDuration());
         return response;
     }
+    public List<DisplayVendorDetails> displayAllVendors(){
+        List<DisplayVendorDetails> vendorDetailsList = new ArrayList<>();
+        List<Vendor> vendorList = vendorRepository.findAll();
+        if (vendorList.isEmpty())
+            throw new NoVendorFoundException("No vendor found.");
+        for(Vendor vendor : vendorList) {
+            List<VendorService> providedServicesByVendor = vendor.getVendorServices();
+            List<VendorServiceDetails> serviceDetails = new ArrayList<>();
+            for (VendorService vendorService : providedServicesByVendor){
+                VendorServiceDetails vendorServiceDetails = new VendorServiceDetails();
+                vendorServiceDetails.setDuration(vendorService.getDuration());
+                vendorServiceDetails.setPrice(vendorService.getPrice());
+                vendorServiceDetails.setServiceCategory(vendorService.getServiceCategory());
+                serviceDetails.add(vendorServiceDetails);
+            }
+            DisplayVendorDetails vendorDetails = new DisplayVendorDetails();
+            vendorDetails.setVendorName(vendor.getUser().getName());
+            vendorDetails.setVendorEmail(vendor.getUser().getEmail());
+            vendorDetails.setVendorServiceDetails(serviceDetails);
+            vendorDetailsList.add(vendorDetails);
+        }
+        return vendorDetailsList;
+    }
     public DisplayVendorDetails displayVendor(Long id) {
         Vendor vendor = vendorRepository.findById(id).orElseThrow(() -> new NoVendorFoundException("Vendor not found"));
 

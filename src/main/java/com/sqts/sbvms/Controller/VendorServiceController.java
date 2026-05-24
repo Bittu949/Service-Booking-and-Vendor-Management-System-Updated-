@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 public class VendorServiceController {
@@ -36,6 +37,16 @@ public class VendorServiceController {
                         vendorServiceService.assignServiceToVendor(request),
                         LocalDateTime.now()),
                 HttpStatus.CREATED);
+    }
+    @GetMapping("/vendor")
+    public ResponseEntity<ApiResponse<List<DisplayVendorDetails>>> displayAllVendors(){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Data found.",
+                        vendorServiceService.displayAllVendors(),
+                        LocalDateTime.now()),
+                HttpStatus.OK);
     }
     @GetMapping("/vendor/{id}")
     public ResponseEntity<ApiResponse<DisplayVendorDetails>> displayVendor(@PathVariable Long id){
