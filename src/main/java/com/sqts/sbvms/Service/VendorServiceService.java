@@ -174,4 +174,10 @@ public class VendorServiceService {
         vendorRepository.delete(vendor);
         return response;
     }
+    public void removeAssignedServiceFromVendor(Long vendorId, Long serviceId){
+        Vendor vendor = vendorRepository.findById(vendorId).orElseThrow(() -> new VendorNotFoundException("Vendor not found."));
+        ServiceCategory serviceCategory = serviceCategoryRepository.findById(serviceId).orElseThrow(() -> new ServiceNotFoundException("Service not found."));
+
+        vendorServiceRepository.removeByVendor_idAndServiceCategory_id(vendorId, serviceId);
+    }
 }

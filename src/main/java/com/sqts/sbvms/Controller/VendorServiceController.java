@@ -89,4 +89,16 @@ public class VendorServiceController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
+    @DeleteMapping("/vendor/{vendorId}/services/{serviceId}")
+    public ResponseEntity<ApiResponse<String>> removeAssignedServiceFromVendor(@PathVariable(name = "vendorId") long vendorId,
+                                                                               @PathVariable(name = "serviceId") long serviceId){
+        vendorServiceService.removeAssignedServiceFromVendor(vendorId, serviceId);
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Service removed from vendor successfully.",
+                        null,
+                        LocalDateTime.now()),
+                HttpStatus.OK);
+    }
 }
