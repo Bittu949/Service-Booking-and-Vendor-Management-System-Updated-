@@ -180,4 +180,20 @@ public class VendorServiceService {
 
         vendorServiceRepository.removeByVendor_idAndServiceCategory_id(vendorId, serviceId);
     }
+    public ServiceUpdationResponse updateAssignedServiceDetails(Long vendorId, Long serviceId, ServiceUpdationRequest request){
+        if(request==null)
+            throw new InvalidInputException("Please provide details to update");
+        VendorService vendorService = vendorServiceRepository.findByVendor_idAndServiceCategory_id(vendorId, serviceId);
+        if(request.getDuration() != null)
+            vendorService.setDuration(request.getDuration());
+        if(request.getPrice() != null)
+            vendorService.setPrice(request.getPrice());
+        vendorServiceRepository.save(vendorService);
+        ServiceUpdationResponse response = new ServiceUpdationResponse();
+        response.setVendorName(vendorService.getVendor().getUser().getName());
+        response.setServiceName(vendorService.getServiceCategory().getServiceName());
+        response.setPrice(request.getPrice());
+        response.setDuration(request.getDuration());
+        return response;
+    }
 }

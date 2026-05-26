@@ -3,6 +3,7 @@ package com.sqts.sbvms.Controller;
 import com.sqts.sbvms.Dto.*;
 import com.sqts.sbvms.Entity.User;
 import com.sqts.sbvms.Entity.Vendor;
+import com.sqts.sbvms.Entity.VendorService;
 import com.sqts.sbvms.Service.VendorServiceService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -98,6 +99,18 @@ public class VendorServiceController {
                         true,
                         "Service removed from vendor successfully.",
                         null,
+                        LocalDateTime.now()),
+                HttpStatus.OK);
+    }
+    @PutMapping("/vendor/{vendorId}/services/{serviceId}")
+    public ResponseEntity<ApiResponse<ServiceUpdationResponse>> updateAssignedServiceDetails(@PathVariable(name = "vendorId") long vendorId,
+                                                                                   @PathVariable(name = "serviceId") long serviceId,
+                                                                                   @RequestBody ServiceUpdationRequest request){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Service updated successfully.",
+                        vendorServiceService.updateAssignedServiceDetails(vendorId, serviceId, request),
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }

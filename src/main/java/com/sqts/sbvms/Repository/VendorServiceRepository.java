@@ -10,4 +10,5 @@ public interface VendorServiceRepository extends JpaRepository<VendorService, Lo
     List<VendorService> findByVendorId(Long id);
     boolean existsByVendorIdAndServiceCategoryId(Long vendorId, Long serviceCategoryId);
     void removeByVendor_idAndServiceCategory_id(Long vendorId, Long serviceId);
+    VendorService findByVendor_idAndServiceCategory_id(Long vendorId, Long serviceId);
 }
