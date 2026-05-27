@@ -3,10 +3,7 @@ package com.sqts.sbvms.Service;
 import com.sqts.sbvms.Dto.VendorByServiceResponse;
 import com.sqts.sbvms.Entity.ServiceCategory;
 import com.sqts.sbvms.Entity.VendorService;
-import com.sqts.sbvms.Exception.InvalidInputException;
-import com.sqts.sbvms.Exception.NoServiceFoundException;
-import com.sqts.sbvms.Exception.ServiceNotFoundException;
-import com.sqts.sbvms.Exception.VendorNotFoundException;
+import com.sqts.sbvms.Exception.*;
 import com.sqts.sbvms.Repository.ServiceCategoryRepository;
 import com.sqts.sbvms.Repository.VendorServiceRepository;
 import org.springframework.stereotype.Service;
@@ -62,7 +59,7 @@ public class ServiceCategoryService {
                                     .orElseThrow(() -> new ServiceNotFoundException("Service not found."));
         List<VendorService> vendorServices = vendorServiceRepository.findByServiceCategory(service);
         if(vendorServices.isEmpty())
-            throw new VendorNotFoundException("No vendor provides this service.");
+            throw new ServiceAssignmentNotFoundException("No vendor provides this service.");
         List<VendorByServiceResponse> vendorByServiceResponses = new ArrayList<>();
         for(VendorService vendorService : vendorServices){
             VendorByServiceResponse response = new VendorByServiceResponse();

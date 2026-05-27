@@ -174,4 +174,14 @@ public class GlobalExceptionHandler {
                         LocalDateTime.now()),
                 HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(ServiceAssignmentNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleServiceAssignmentNotFoundException(ServiceAssignmentNotFoundException ex){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        false,
+                        ex.getMessage(),
+                        null,
+                        LocalDateTime.now()),
+                HttpStatus.BAD_REQUEST);
+    }
 }
