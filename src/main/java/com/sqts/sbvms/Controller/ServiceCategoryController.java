@@ -1,6 +1,7 @@
 package com.sqts.sbvms.Controller;
 
 import com.sqts.sbvms.Dto.ApiResponse;
+import com.sqts.sbvms.Dto.VendorByServiceResponse;
 import com.sqts.sbvms.Entity.ServiceCategory;
 import com.sqts.sbvms.Service.ServiceCategoryService;
 import jakarta.validation.Valid;
@@ -65,6 +66,16 @@ public class ServiceCategoryController {
                         true,
                         "Service found.",
                         serviceCategoryService.getSingleServices(serviceId),
+                        LocalDateTime.now()),
+                HttpStatus.OK);
+    }
+    @GetMapping("/services/{id}/vendors")
+    public ResponseEntity<ApiResponse<List<VendorByServiceResponse>>> getVendorsByService(@PathVariable(name = "id") Long serviceId){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Data found.",
+                        serviceCategoryService.getVendorsByService(serviceId),
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
