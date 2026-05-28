@@ -257,4 +257,11 @@ public class VendorServiceService {
     public Long countTotalServices(){
         return serviceCategoryRepository.count();
     }
+    public boolean checkVendorHasService(Long vendorId, Long serviceId){
+        Vendor vendor = vendorRepository.findById(vendorId).orElseThrow(() -> new VendorNotFoundException("Vendor not found."));
+        ServiceCategory serviceCategory = serviceCategoryRepository.findById(serviceId).orElseThrow(() -> new ServiceNotFoundException("Service not found."));
+
+        VendorService vendorService = vendorServiceRepository.findByVendor_idAndServiceCategory_id(vendor.getId(), serviceCategory.getId());
+        return vendorService != null;
+    }
 }
