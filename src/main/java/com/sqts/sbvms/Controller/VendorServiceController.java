@@ -179,4 +179,15 @@ public class VendorServiceController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
+    @PostMapping("/vendor/{id}/services/bulk")
+    public ResponseEntity<ApiResponse<List<ServiceAssignmentResponse>>> bulkServiceAssignment(@PathVariable("id") Long vendorId,
+                                                                      @RequestBody List<BulkServiceAssignmentRequest> request){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "services assigned successfully.",
+                        vendorServiceService.bulkServiceAssignment(vendorId, request),
+                        LocalDateTime.now()),
+                HttpStatus.OK);
+    }
 }

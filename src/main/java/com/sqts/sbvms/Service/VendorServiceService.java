@@ -264,4 +264,28 @@ public class VendorServiceService {
         VendorService vendorService = vendorServiceRepository.findByVendor_idAndServiceCategory_id(vendor.getId(), serviceCategory.getId());
         return vendorService != null;
     }
+    public List<ServiceAssignmentResponse> bulkServiceAssignment(Long vendorId, List<BulkServiceAssignmentRequest> requests){
+        Vendor vendor = vendorRepository.findById(vendorId).orElseThrow(() -> new VendorNotFoundException("Vendor not found."));
+        List<ServiceAssignmentResponse> responses = new ArrayList<>();
+
+        for(BulkServiceAssignmentRequest request : requests){
+            ServiceCategory service = serviceCategoryRepository.findById(request.getServiceCategoryId())
+                                                               .orElseThrow(() -> new ServiceNotFoundException("Service not found."));
+            VendorService vendorService = new VendorService();
+            vendorService.setVendor(vendor);
+            vendorService.setServiceCategory(service);
+            vendorService.setPrice(request.getPrice());
+            vendorService.setDuration(request.getDuration());
+
+            vendorServiceRepository.save(vendorService);
+
+            ServiceAssignmentResponse response = new ServiceAssignmentResponse();
+            response.setVendorId(vendor.getId());
+            response.setServiceCategoryName(service.getServiceName());
+            response.setPrice(request.getPrice());
+            response.setDuration(request.getDuration());
+            responses.add(response);
+        }
+        return responses;
+    }
 }
