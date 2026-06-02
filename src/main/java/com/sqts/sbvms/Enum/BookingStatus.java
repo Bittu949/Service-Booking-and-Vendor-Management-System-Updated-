@@ -1,6 +1,6 @@
 package com.sqts.sbvms.Enum;
 
-public enum Status {
+public enum BookingStatus {
     PENDING,
     CONFIRMED,
     CANCELLED,

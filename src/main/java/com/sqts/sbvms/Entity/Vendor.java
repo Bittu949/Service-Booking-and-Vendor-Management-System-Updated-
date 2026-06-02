@@ -1,5 +1,6 @@
 package com.sqts.sbvms.Entity;
 
+import com.sqts.sbvms.Enum.VendorStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -26,4 +27,6 @@ public class Vendor {
             cascade = CascadeType.ALL,
             orphanRemoval = true)
     List<VendorService> vendorServices;
+    @Enumerated(EnumType.STRING)
+    private VendorStatus status;
 }

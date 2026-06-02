@@ -1,6 +1,6 @@
 package com.sqts.sbvms.Entity;
 
-import com.sqts.sbvms.Enum.Status;
+import com.sqts.sbvms.Enum.BookingStatus;
 import com.sqts.sbvms.Model.TimeSlot;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -34,5 +34,5 @@ public class Booking {
     private TimeSlot timeSlot;
     @NotNull
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private BookingStatus status;
 }
