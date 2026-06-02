@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,4 +24,8 @@ public class ServiceCategory {
     private String serviceName;
     @NotBlank
     private String description;
+    @OneToMany(mappedBy = "serviceCategory",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<VendorService> vendorServices;
 }
