@@ -265,6 +265,7 @@ public class VendorServiceService {
         response.setVendorName(vendor.getUser().getName());
         response.setVendorEmail(vendor.getUser().getEmail());
         response.setTotalAssignedServices(count);
+        response.setStatus(vendor.getStatus());
         return response;
     }
     public Long countTotalVendors(){
