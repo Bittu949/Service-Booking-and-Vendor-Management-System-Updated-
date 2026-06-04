@@ -184,4 +184,14 @@ public class GlobalExceptionHandler {
                         LocalDateTime.now()),
                 HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(InvalidVendorStatusException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInvalidVendorStatusException(InvalidVendorStatusException ex){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        false,
+                        ex.getMessage(),
+                        null,
+                        LocalDateTime.now()),
+                HttpStatus.BAD_REQUEST);
+    }
 }

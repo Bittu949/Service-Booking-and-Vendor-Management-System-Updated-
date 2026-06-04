@@ -71,6 +71,9 @@ public class VendorServiceService {
                 .orElseThrow(() ->
                         new VendorNotFoundException("Vendor not found."));
 
+        if(vendor.getStatus() != VendorStatus.ACTIVE)
+            throw new InvalidVendorStatusException("Only active vendors can be assigned services.");
+
         ServiceCategory serviceCategory = serviceCategoryRepository.findById(request.getServiceCategoryId())
                 .orElseThrow(() ->
                         new ServiceNotFoundException("Service not found."));
