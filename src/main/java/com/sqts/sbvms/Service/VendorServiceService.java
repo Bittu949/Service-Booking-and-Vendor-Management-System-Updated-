@@ -98,6 +98,9 @@ public class VendorServiceService {
     public List<DisplayVendorDetails> displayAllVendors(){
         List<DisplayVendorDetails> vendorDetailsList = new ArrayList<>();
         List<Vendor> vendorList = vendorRepository.findAll();
+        vendorList = vendorList.stream()
+                .filter(v -> v.getStatus() == VendorStatus.ACTIVE)
+                .toList();
         if (vendorList.isEmpty())
             throw new NoVendorFoundException("No vendor found.");
         for(Vendor vendor : vendorList) {
@@ -156,6 +159,7 @@ public class VendorServiceService {
         displayVendorDetails.setVendorName(name);
         displayVendorDetails.setVendorEmail(email);
         displayVendorDetails.setVendorServiceDetails(serviceDetails);
+        displayVendorDetails.setVendorStatus(vendor.getStatus());
         return displayVendorDetails;
     }
     public VendorUpdateResponse updateVendor(Long vendorId, VendorUpdateRequest request){

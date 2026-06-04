@@ -1,5 +1,8 @@
 package com.sqts.sbvms.Dto;
 
+import com.sqts.sbvms.Enum.VendorStatus;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -20,4 +23,6 @@ public class DisplayVendorDetails {
     @NotBlank
     private String vendorEmail;
     private List<VendorServiceDetails> vendorServiceDetails;
+    @Enumerated(EnumType.STRING)
+    private VendorStatus vendorStatus;
 }
