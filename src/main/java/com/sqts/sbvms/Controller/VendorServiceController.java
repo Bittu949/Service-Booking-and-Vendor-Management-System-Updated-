@@ -190,4 +190,20 @@ public class VendorServiceController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
+    @PatchMapping("/vendor/{id}/status")
+    public ResponseEntity<ApiResponse<String>> updateVendorStatus(
+            @PathVariable("id") Long vendorId,
+            @Valid @RequestBody VendorStatusUpdateRequest request){
+
+        vendorServiceService.updateVendorStatus(vendorId, request);
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Vendor status updated successfully.",
+                        null,
+                        LocalDateTime.now()
+                ),
+                HttpStatus.OK
+        );
+    }
 }

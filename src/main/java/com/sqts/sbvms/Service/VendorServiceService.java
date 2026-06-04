@@ -310,4 +310,13 @@ public class VendorServiceService {
         }
         return responses;
     }
+    public void updateVendorStatus(Long vendorId,
+                                   VendorStatusUpdateRequest request){
+
+        Vendor vendor = vendorRepository.findById(vendorId)
+                .orElseThrow(() ->
+                        new VendorNotFoundException("Vendor not found."));
+        vendor.setStatus(request.getStatus());
+        vendorRepository.save(vendor);
+    }
 }
