@@ -276,6 +276,9 @@ public class VendorServiceService {
     }
     public boolean checkVendorHasService(Long vendorId, Long serviceId){
         Vendor vendor = vendorRepository.findById(vendorId).orElseThrow(() -> new VendorNotFoundException("Vendor not found."));
+
+        if(vendor.getStatus() != VendorStatus.ACTIVE)
+            return false;
         ServiceCategory serviceCategory = serviceCategoryRepository.findById(serviceId).orElseThrow(() -> new ServiceNotFoundException("Service not found."));
 
         VendorService vendorService = vendorServiceRepository.findByVendor_idAndServiceCategory_id(vendor.getId(), serviceCategory.getId());
@@ -283,6 +286,8 @@ public class VendorServiceService {
     }
     public List<ServiceAssignmentResponse> bulkServiceAssignment(Long vendorId, List<BulkServiceAssignmentRequest> requests){
         Vendor vendor = vendorRepository.findById(vendorId).orElseThrow(() -> new VendorNotFoundException("Vendor not found."));
+        if(vendor.getStatus() != VendorStatus.ACTIVE)
+            throw new InvalidVendorStatusException("Vendor is not active.");
         List<ServiceAssignmentResponse> responses = new ArrayList<>();
 
         for(BulkServiceAssignmentRequest request : requests){
