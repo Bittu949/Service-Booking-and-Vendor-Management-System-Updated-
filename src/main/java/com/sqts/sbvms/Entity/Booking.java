@@ -35,4 +35,7 @@ public class Booking {
     @NotNull
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
+    @NotNull
+    @ManyToOne
+    private ServiceCategory serviceCategory;
 }

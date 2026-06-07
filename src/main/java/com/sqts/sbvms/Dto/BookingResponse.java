@@ -1,6 +1,7 @@
 package com.sqts.sbvms.Dto;
 
 import com.sqts.sbvms.Enum.BookingStatus;
+import com.sqts.sbvms.Model.TimeSlot;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
@@ -17,10 +18,9 @@ import java.time.LocalDate;
 public class BookingResponse {
     private Long bookingId;
     private String customerName;
-    private String vendorName;
     private String serviceName;
     private LocalDate bookingDate;
-    private String timeSlot;
+    private TimeSlot timeSlot;
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
 }
