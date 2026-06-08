@@ -97,7 +97,7 @@ public class BookingService {
 
         for(VendorService vendorService : vendorServices){
             List<Booking> vendorBookings =
-                    bookingRepository.findByVendorId(vendorService.getVendor().getId());
+                    bookingRepository.findByVendorServiceVendorId(vendorService.getVendor().getId());
             boolean hasOverlap = vendorBookings.stream()
                     .filter(b -> b.getStatus() == BookingStatus.CONFIRMED)
                     .filter(b -> b.getBookingDate().equals(bookingDate))
