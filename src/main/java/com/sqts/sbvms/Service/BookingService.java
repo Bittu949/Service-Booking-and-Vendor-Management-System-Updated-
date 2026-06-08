@@ -2,6 +2,7 @@ package com.sqts.sbvms.Service;
 
 import com.sqts.sbvms.Dto.BookingRequest;
 import com.sqts.sbvms.Dto.BookingResponse;
+import com.sqts.sbvms.Dto.PendingBookingResponse;
 import com.sqts.sbvms.Entity.Booking;
 import com.sqts.sbvms.Entity.ServiceCategory;
 import com.sqts.sbvms.Entity.User;
@@ -12,6 +13,7 @@ import com.sqts.sbvms.Repository.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -57,5 +59,22 @@ public class BookingService {
         response.setServiceName(serviceCategory.getServiceName());
         response.setCustomerName(user.getName());
         return response;
+    }
+    public List<PendingBookingResponse> getPendingBookings(){
+        List<PendingBookingResponse> pendingBookings = new ArrayList<>();
+        List<Booking> bookings = bookingRepository.findByStatus(BookingStatus.PENDING);
+
+        for(Booking booking : bookings){
+            PendingBookingResponse response = new PendingBookingResponse();
+            response.setBookingId(booking.getId());
+            response.setBookingDate(booking.getBookingDate());
+            response.setServiceName(booking.getServiceCategory().getServiceName());
+            response.setCustomerName(booking.getUser().getName());
+            response.setStartTime(booking.getTimeSlot().getStartTime());
+            response.setEndTime(booking.getTimeSlot().getEndTime());
+            response.setStatus(booking.getStatus());
+            pendingBookings.add(response);
+        }
+        return pendingBookings;
     }
 }
