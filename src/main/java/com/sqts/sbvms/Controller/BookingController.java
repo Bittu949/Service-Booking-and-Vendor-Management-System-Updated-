@@ -1,16 +1,10 @@
 package com.sqts.sbvms.Controller;
 
-import com.sqts.sbvms.Dto.ApiResponse;
-import com.sqts.sbvms.Dto.BookingRequest;
-import com.sqts.sbvms.Dto.BookingResponse;
-import com.sqts.sbvms.Dto.PendingBookingResponse;
+import com.sqts.sbvms.Dto.*;
 import com.sqts.sbvms.Service.BookingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,6 +33,17 @@ public class BookingController {
                         true,
                         pendingBookings.isEmpty() ? "No pending bookings at the moment" : "Bookings found.",
                         pendingBookings,
+                        LocalDateTime.now()),
+                HttpStatus.OK);
+    }
+    @GetMapping("/bookings/{bookingId}/available-vendors")
+    public ResponseEntity<ApiResponse<List<AvailableVendorResponse>>> getAvailableVendorsForBooking(@PathVariable(name = "bookingId") Long bookingId){
+        List<AvailableVendorResponse> availableVendors = bookingService.getAvailableVendorsForBooking(bookingId);
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        availableVendors.isEmpty() ? "No vendor available at the moment" : "Vendors found.",
+                        availableVendors,
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }

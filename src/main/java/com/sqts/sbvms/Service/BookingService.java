@@ -1,17 +1,17 @@
 package com.sqts.sbvms.Service;
 
+import com.sqts.sbvms.Dto.AvailableVendorResponse;
 import com.sqts.sbvms.Dto.BookingRequest;
 import com.sqts.sbvms.Dto.BookingResponse;
 import com.sqts.sbvms.Dto.PendingBookingResponse;
-import com.sqts.sbvms.Entity.Booking;
-import com.sqts.sbvms.Entity.ServiceCategory;
-import com.sqts.sbvms.Entity.User;
-import com.sqts.sbvms.Entity.Vendor;
+import com.sqts.sbvms.Entity.*;
 import com.sqts.sbvms.Enum.BookingStatus;
+import com.sqts.sbvms.Enum.VendorStatus;
 import com.sqts.sbvms.Exception.*;
 import com.sqts.sbvms.Repository.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,5 +76,48 @@ public class BookingService {
             pendingBookings.add(response);
         }
         return pendingBookings;
+    }
+    public List<AvailableVendorResponse> getAvailableVendorsForBooking(Long bookingId){
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new BookingNotFoundException("Booking not found."));
+
+        if(booking.getStatus() != BookingStatus.PENDING)
+            throw new InvalidBookingStateException("Available vendors can only be fetched for pending bookings.");
+
+        ServiceCategory serviceCategory = booking.getServiceCategory();
+        LocalDate bookingDate = booking.getBookingDate();
+        LocalTime bookingStart = booking.getTimeSlot().getStartTime();
+        LocalTime bookingEnd = booking.getTimeSlot().getEndTime();
+        List<AvailableVendorResponse> availableVendors = new ArrayList<>();
+
+        //Fetching all the vendor service for particular service category
+        List<VendorService> vendorServices =
+                vendorServiceRepository.findByServiceCategoryId(serviceCategory.getId());
+        //Filtering only those vendor services whose vendors are active
+        vendorServices = vendorServices.stream().filter(v -> v.getVendor().getStatus() == VendorStatus.ACTIVE).toList();
+
+        for(VendorService vendorService : vendorServices){
+            List<Booking> vendorBookings =
+                    bookingRepository.findByVendorId(vendorService.getVendor().getId());
+            boolean hasOverlap = vendorBookings.stream()
+                    .filter(b -> b.getStatus() == BookingStatus.CONFIRMED)
+                    .filter(b -> b.getBookingDate().equals(bookingDate))
+                    .anyMatch(b ->
+                            bookingStart.isBefore(b.getTimeSlot().getEndTime())
+                                    &&
+                                    bookingEnd.isAfter(b.getTimeSlot().getStartTime())
+                    );
+            if(!hasOverlap){
+                Vendor vendor = vendorService.getVendor();
+                AvailableVendorResponse response = new AvailableVendorResponse();
+                response.setVendorId(vendor.getId());
+                response.setVendorName(vendor.getUser().getName());
+                response.setVendorEmail(vendor.getUser().getEmail());
+                response.setStatus(vendor.getStatus());
+                response.setPrice(vendorService.getPrice());
+
+                availableVendors.add(response);
+            }
+        }
+        return availableVendors;
     }
 }
