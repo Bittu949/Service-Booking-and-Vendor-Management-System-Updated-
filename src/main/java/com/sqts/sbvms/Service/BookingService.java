@@ -22,13 +22,11 @@ public class BookingService {
     public BookingService(BookingRepository bookingRepository,
                           UserRepository userRepository,
                           ServiceCategoryRepository serviceCategoryRepository,
-                          VendorServiceRepository vendorServiceRepository,
-                          VendorRepository vendorRepository){
+                          VendorServiceRepository vendorServiceRepository){
         this.bookingRepository = bookingRepository;
         this.userRepository = userRepository;
         this.serviceCategoryRepository = serviceCategoryRepository;
         this.vendorServiceRepository = vendorServiceRepository;
-        this.vendorRepository = vendorRepository;
     }
     public BookingResponse createBooking(BookingRequest request){
         if(request == null ||
