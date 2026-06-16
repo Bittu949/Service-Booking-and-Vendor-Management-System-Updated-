@@ -58,4 +58,14 @@ public class BookingController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
+    @GetMapping("/bookings/{id}")
+    public ResponseEntity<ApiResponse<BookingDetailsResponse>> getBookingById(@PathVariable(name = "id") Long bookingId){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Booking found.",
+                        bookingService.getBookingById(bookingId),
+                        LocalDateTime.now()),
+                HttpStatus.OK);
+    }
 }

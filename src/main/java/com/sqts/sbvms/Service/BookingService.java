@@ -166,4 +166,22 @@ public class BookingService {
 
         return response;
     }
+    public BookingDetailsResponse getBookingById(Long bookingId){
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new BookingNotFoundException("Booking not found."));
+        BookingDetailsResponse response = new BookingDetailsResponse();
+        response.setBookingId(booking.getId());
+        response.setBookingDate(booking.getBookingDate());
+        response.setBookingStatus(booking.getStatus());
+        response.setStartTime(booking.getTimeSlot().getStartTime());
+        response.setEndTime(booking.getTimeSlot().getEndTime());
+        response.setServiceName(booking.getServiceCategory().getServiceName());
+        response.setCustomerName(booking.getUser().getName());
+        if(booking.getVendorService() != null) {
+            response.setVendorId(booking.getVendorService().getVendor().getId());
+            response.setVendorName(booking.getVendorService().getVendor().getUser().getName());
+        }
+
+        return response;
+    }
 }
