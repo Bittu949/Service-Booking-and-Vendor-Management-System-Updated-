@@ -37,7 +37,8 @@ public class BookingService {
                 request.getUserId() == null ||
                 request.getServiceId() == null ||
                 request.getBookingDate() == null ||
-                request.getTimeSlot() == null)
+                request.getTimeSlot() == null ||
+                request.getBookingAddress() == null)
             throw new InvalidInputException("Please provide all the details.");
         Booking booking = new Booking();
         User user = userRepository.findById(request.getUserId()).orElseThrow(() -> new UserNotFoundException("User not found."));
@@ -47,6 +48,7 @@ public class BookingService {
         booking.setTimeSlot(request.getTimeSlot());
         booking.setStatus(BookingStatus.PENDING);
         booking.setServiceCategory(serviceCategory);
+        booking.setBookingAddress(request.getBookingAddress());
         bookingRepository.save(booking);
 
         BookingResponse response = new BookingResponse();
@@ -56,6 +58,7 @@ public class BookingService {
         response.setTimeSlot(booking.getTimeSlot());
         response.setServiceName(serviceCategory.getServiceName());
         response.setCustomerName(user.getName());
+        response.setBookingAddress(booking.getBookingAddress());
         return response;
     }
     public List<PendingBookingResponse> getPendingBookings(){
@@ -71,10 +74,12 @@ public class BookingService {
             response.setStartTime(booking.getTimeSlot().getStartTime());
             response.setEndTime(booking.getTimeSlot().getEndTime());
             response.setStatus(booking.getStatus());
+            response.setBookingAddress(booking.getBookingAddress());
             pendingBookings.add(response);
         }
         return pendingBookings;
     }
+    //Note: Need to look if address based vendor displaying need to be implemented or not
     public List<AvailableVendorResponse> getAvailableVendorsForBooking(Long bookingId){
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new BookingNotFoundException("Booking not found."));
 
@@ -112,6 +117,7 @@ public class BookingService {
                 response.setVendorEmail(vendor.getUser().getEmail());
                 response.setStatus(vendor.getStatus());
                 response.setPrice(vendorService.getPrice());
+                response.setVendorAddress(vendor.getVendorAddress());
 
                 availableVendors.add(response);
             }
@@ -164,6 +170,8 @@ public class BookingService {
         response.setVendorName(booking.getVendorService().getVendor().getUser().getName());
         response.setStartTime(booking.getTimeSlot().getStartTime());
         response.setEndTime(booking.getTimeSlot().getEndTime());
+        response.setBookingAddress(booking.getBookingAddress());
+        response.setVendorAddress(booking.getVendorService().getVendor().getVendorAddress());
 
         return response;
     }
@@ -178,9 +186,12 @@ public class BookingService {
         response.setEndTime(booking.getTimeSlot().getEndTime());
         response.setServiceName(booking.getServiceCategory().getServiceName());
         response.setCustomerName(booking.getUser().getName());
+        response.setBookingAddress(booking.getBookingAddress());
+
         if(booking.getVendorService() != null) {
             response.setVendorId(booking.getVendorService().getVendor().getId());
             response.setVendorName(booking.getVendorService().getVendor().getUser().getName());
+            response.setVendorAddress(booking.getVendorService().getVendor().getVendorAddress());
         }
 
         return response;
@@ -200,11 +211,14 @@ public class BookingService {
             bookingHistoryResponse.setStartTime(booking.getTimeSlot().getStartTime());
             bookingHistoryResponse.setEndTime(booking.getTimeSlot().getEndTime());
             bookingHistoryResponse.setServiceName(booking.getServiceCategory().getServiceName());
+            bookingHistoryResponse.setBookingAddress(booking.getBookingAddress());
+
             VendorService vendorService = booking.getVendorService();
             if(vendorService != null) {
                 Vendor vendor = vendorService.getVendor();
                 bookingHistoryResponse.setVendorId(vendor.getId());
                 bookingHistoryResponse.setVendorName(vendor.getUser().getName());
+                bookingHistoryResponse.setVendorAddress(vendor.getVendorAddress());
             }
             responses.add(bookingHistoryResponse);
         }
@@ -253,6 +267,7 @@ public class BookingService {
             bookingHistoryResponse.setBookingStatus(booking.getStatus());
             bookingHistoryResponse.setDate(booking.getBookingDate());
             bookingHistoryResponse.setTimeSlot(booking.getTimeSlot());
+            bookingHistoryResponse.setBookingAddress(booking.getBookingAddress());
 
             responses.add(bookingHistoryResponse);
         }
@@ -277,6 +292,7 @@ public class BookingService {
                 Vendor vendor = vendorService.getVendor();
                 response.setVendorId(vendor.getId());
                 response.setVendorName(vendor.getUser().getName());
+                response.setVendorAddress(vendor.getVendorAddress());
             }
             response.setBookingId(booking.getId());
             response.setBookingStatus(booking.getStatus());
@@ -284,6 +300,7 @@ public class BookingService {
             response.setServiceName(booking.getServiceCategory().getServiceName());
             response.setStartTime(booking.getTimeSlot().getStartTime());
             response.setEndTime(booking.getTimeSlot().getEndTime());
+            response.setBookingAddress(booking.getBookingAddress());
 
             allBookings.add(response);
         }

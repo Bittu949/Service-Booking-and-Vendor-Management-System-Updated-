@@ -1,5 +1,6 @@
 package com.sqts.sbvms.Dto;
 
+import com.sqts.sbvms.Model.Address;
 import com.sqts.sbvms.Model.TimeSlot;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -15,11 +16,13 @@ import java.time.LocalDate;
 @Setter
 public class BookingRequest {
     @NotNull
-    Long userId;
+    private Long userId;
     @NotNull
-    Long serviceId;
+    private Long serviceId;
     @NotNull
-    LocalDate bookingDate;
+    private LocalDate bookingDate;
     @NotNull
-    TimeSlot timeSlot;
+    private TimeSlot timeSlot;
+    @NotNull
+    private Address bookingAddress;
 }

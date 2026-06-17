@@ -1,6 +1,7 @@
 package com.sqts.sbvms.Dto;
 
 import com.sqts.sbvms.Enum.BookingStatus;
+import com.sqts.sbvms.Model.Address;
 import com.sqts.sbvms.Model.TimeSlot;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,4 +21,5 @@ public class VendorBookingHistoryResponse {
     private LocalDate date;
     private TimeSlot timeSlot;
     private BookingStatus bookingStatus;
+    private Address bookingAddress;
 }

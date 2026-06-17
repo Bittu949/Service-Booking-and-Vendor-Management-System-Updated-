@@ -17,6 +17,5 @@ public class VendorSummaryResponse {
     private String vendorName;
     private String vendorEmail;
     private Long totalAssignedServices;
-    @Enumerated(EnumType.STRING)
     private VendorStatus status;
 }

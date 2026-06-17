@@ -1,6 +1,7 @@
 package com.sqts.sbvms.Dto;
 
 import com.sqts.sbvms.Enum.VendorStatus;
+import com.sqts.sbvms.Model.Address;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,4 +17,5 @@ public class AvailableVendorResponse {
     private String vendorEmail;
     private Long price;
     private VendorStatus status;
+    private Address vendorAddress;
 }

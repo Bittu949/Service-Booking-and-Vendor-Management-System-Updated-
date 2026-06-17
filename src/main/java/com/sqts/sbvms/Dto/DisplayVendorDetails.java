@@ -23,6 +23,5 @@ public class DisplayVendorDetails {
     @NotBlank
     private String vendorEmail;
     private List<VendorServiceDetails> vendorServiceDetails;
-    @Enumerated(EnumType.STRING)
     private VendorStatus vendorStatus;
 }

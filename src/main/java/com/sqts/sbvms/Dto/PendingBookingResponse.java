@@ -1,6 +1,7 @@
 package com.sqts.sbvms.Dto;
 
 import com.sqts.sbvms.Enum.BookingStatus;
+import com.sqts.sbvms.Model.Address;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,6 @@ public class PendingBookingResponse {
     private LocalDate bookingDate;
     private LocalTime startTime;
     private LocalTime endTime;
-    @Enumerated(EnumType.STRING)
     private BookingStatus status;
+    private Address bookingAddress;
 }
