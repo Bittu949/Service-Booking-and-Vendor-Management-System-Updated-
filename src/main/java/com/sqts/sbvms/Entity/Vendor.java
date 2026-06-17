@@ -1,6 +1,7 @@
 package com.sqts.sbvms.Entity;
 
 import com.sqts.sbvms.Enum.VendorStatus;
+import com.sqts.sbvms.Model.Address;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -29,4 +30,6 @@ public class Vendor {
     List<VendorService> vendorServices;
     @Enumerated(EnumType.STRING)
     private VendorStatus status;
+    @Embedded
+    Address vendorAddress;
 }

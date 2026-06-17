@@ -1,6 +1,7 @@
 package com.sqts.sbvms.Entity;
 
 import com.sqts.sbvms.Enum.BookingStatus;
+import com.sqts.sbvms.Model.Address;
 import com.sqts.sbvms.Model.TimeSlot;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -39,4 +40,6 @@ public class Booking {
     @ManyToOne
     @JoinColumn(name = "service_category_id")
     private ServiceCategory serviceCategory;
+    @Embedded
+    Address bookingAddress;
 }
