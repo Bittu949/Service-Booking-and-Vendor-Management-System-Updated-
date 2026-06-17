@@ -6,6 +6,7 @@ import com.sqts.sbvms.Enum.BookingStatus;
 import com.sqts.sbvms.Enum.VendorStatus;
 import com.sqts.sbvms.Exception.*;
 import com.sqts.sbvms.Repository.*;
+import lombok.Getter;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -257,9 +258,17 @@ public class BookingService {
         }
         return responses;
     }
-    public List<BookingHistoryResponse> getAllBookings(){
+    public List<BookingHistoryResponse> getFilteredBookings(BookingStatus bookingStatus, LocalDate bookingDate){
         List<Booking> bookings = bookingRepository.findAll();
         List<BookingHistoryResponse> allBookings = new ArrayList<>();
+
+        //Filter bookings on booking status
+        if(bookingStatus != null)
+            bookings = bookings.stream().filter(b -> b.getStatus() == bookingStatus).toList();
+
+        //Filter bookings on booking date
+        if(bookingDate != null)
+            bookings = bookings.stream().filter(b -> b.getBookingDate().equals(bookingDate)).toList();
 
         for(Booking booking : bookings){
             BookingHistoryResponse response = new BookingHistoryResponse();
@@ -279,5 +288,8 @@ public class BookingService {
             allBookings.add(response);
         }
         return allBookings;
+    }
+    public Long getBookingsCount(){
+        return bookingRepository.count();
     }
 }

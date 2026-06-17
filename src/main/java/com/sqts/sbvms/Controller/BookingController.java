@@ -1,11 +1,13 @@
 package com.sqts.sbvms.Controller;
 
 import com.sqts.sbvms.Dto.*;
+import com.sqts.sbvms.Enum.BookingStatus;
 import com.sqts.sbvms.Service.BookingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -102,13 +104,24 @@ public class BookingController {
                 HttpStatus.OK);
     }
     @GetMapping("/bookings")
-    public ResponseEntity<ApiResponse<List<BookingHistoryResponse>>> getAllBookings(){
-        List<BookingHistoryResponse> bookings = bookingService.getAllBookings();
+    public ResponseEntity<ApiResponse<List<BookingHistoryResponse>>> getFilteredBookings(@RequestParam(name = "status", required = false) BookingStatus bookingStatus,
+                                                                                    @RequestParam(name = "date", required = false) LocalDate bookingDate){
+        List<BookingHistoryResponse> bookings = bookingService.getFilteredBookings(bookingStatus, bookingDate);
         return new ResponseEntity<>(
                 new ApiResponse<>(
                         true,
-                        !bookings.isEmpty() ? "Booking found." : "Bookings not found",
+                        !bookings.isEmpty() ? "Bookings found." : "Bookings not found",
                         bookings,
+                        LocalDateTime.now()),
+                HttpStatus.OK);
+    }
+    @GetMapping("/bookings/count")
+    public ResponseEntity<ApiResponse<Long>> getBookingsCount(){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Booking count retrieved successfully.",
+                        bookingService.getBookingsCount(),
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
