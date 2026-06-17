@@ -90,4 +90,15 @@ public class BookingController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
+    @GetMapping("/vendors/{id}/bookings")
+    public ResponseEntity<ApiResponse<List<VendorBookingHistoryResponse>>> getVendorBookingHistory(@PathVariable(name = "id") Long vendorId){
+        List<VendorBookingHistoryResponse> vendorBookings = bookingService.getVendorBookingHistory(vendorId);
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        !vendorBookings.isEmpty() ? "Booking found." : "Bookings not found",
+                        vendorBookings,
+                        LocalDateTime.now()),
+                HttpStatus.OK);
+    }
 }

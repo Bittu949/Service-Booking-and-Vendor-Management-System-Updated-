@@ -19,14 +19,17 @@ public class BookingService {
     private final UserRepository userRepository;
     private final ServiceCategoryRepository serviceCategoryRepository;
     private final VendorServiceRepository vendorServiceRepository;
+    private final VendorRepository vendorRepository;
     public BookingService(BookingRepository bookingRepository,
                           UserRepository userRepository,
                           ServiceCategoryRepository serviceCategoryRepository,
-                          VendorServiceRepository vendorServiceRepository){
+                          VendorServiceRepository vendorServiceRepository,
+                          VendorRepository vendorRepository){
         this.bookingRepository = bookingRepository;
         this.userRepository = userRepository;
         this.serviceCategoryRepository = serviceCategoryRepository;
         this.vendorServiceRepository = vendorServiceRepository;
+        this.vendorRepository = vendorRepository;
     }
     public BookingResponse createBooking(BookingRequest request){
         if(request == null ||
@@ -233,5 +236,25 @@ public class BookingService {
 
         response.setCurrentStatus(booking.getStatus());
         return response;
+    }
+    public List<VendorBookingHistoryResponse> getVendorBookingHistory(Long vendorId){
+        if (!vendorRepository.existsById(vendorId)) {
+            throw new VendorNotFoundException("Vendor not found.");
+        }
+        List<Booking> bookings = bookingRepository.findByVendorServiceVendorId(vendorId);
+        List<VendorBookingHistoryResponse> responses = new ArrayList<>();
+
+        for (Booking booking : bookings){
+            VendorBookingHistoryResponse bookingHistoryResponse = new VendorBookingHistoryResponse();
+            bookingHistoryResponse.setBookingId(booking.getId());
+            bookingHistoryResponse.setCustomerName(booking.getUser().getName());
+            bookingHistoryResponse.setServiceName(booking.getServiceCategory().getServiceName());
+            bookingHistoryResponse.setBookingStatus(booking.getStatus());
+            bookingHistoryResponse.setDate(booking.getBookingDate());
+            bookingHistoryResponse.setTimeSlot(booking.getTimeSlot());
+
+            responses.add(bookingHistoryResponse);
+        }
+        return responses;
     }
 }
