@@ -257,4 +257,27 @@ public class BookingService {
         }
         return responses;
     }
+    public List<BookingHistoryResponse> getAllBookings(){
+        List<Booking> bookings = bookingRepository.findAll();
+        List<BookingHistoryResponse> allBookings = new ArrayList<>();
+
+        for(Booking booking : bookings){
+            BookingHistoryResponse response = new BookingHistoryResponse();
+            VendorService vendorService = booking.getVendorService();
+            if(vendorService != null) {
+                Vendor vendor = vendorService.getVendor();
+                response.setVendorId(vendor.getId());
+                response.setVendorName(vendor.getUser().getName());
+            }
+            response.setBookingId(booking.getId());
+            response.setBookingStatus(booking.getStatus());
+            response.setBookingDate(booking.getBookingDate());
+            response.setServiceName(booking.getServiceCategory().getServiceName());
+            response.setStartTime(booking.getTimeSlot().getStartTime());
+            response.setEndTime(booking.getTimeSlot().getEndTime());
+
+            allBookings.add(response);
+        }
+        return allBookings;
+    }
 }

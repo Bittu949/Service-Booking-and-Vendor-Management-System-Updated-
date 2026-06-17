@@ -101,4 +101,15 @@ public class BookingController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
+    @GetMapping("/bookings")
+    public ResponseEntity<ApiResponse<List<BookingHistoryResponse>>> getAllBookings(){
+        List<BookingHistoryResponse> bookings = bookingService.getAllBookings();
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        !bookings.isEmpty() ? "Booking found." : "Bookings not found",
+                        bookings,
+                        LocalDateTime.now()),
+                HttpStatus.OK);
+    }
 }
