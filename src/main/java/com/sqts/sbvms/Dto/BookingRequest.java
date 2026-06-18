@@ -2,6 +2,7 @@ package com.sqts.sbvms.Dto;
 
 import com.sqts.sbvms.Model.Address;
 import com.sqts.sbvms.Model.TimeSlot;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,5 +25,6 @@ public class BookingRequest {
     @NotNull
     private TimeSlot timeSlot;
     @NotNull
+    @Valid
     private Address bookingAddress;
 }

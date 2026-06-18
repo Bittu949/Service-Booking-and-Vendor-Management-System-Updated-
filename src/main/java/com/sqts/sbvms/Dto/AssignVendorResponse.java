@@ -2,6 +2,7 @@ package com.sqts.sbvms.Dto;
 
 import com.sqts.sbvms.Enum.BookingStatus;
 import com.sqts.sbvms.Model.Address;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,6 @@ public class AssignVendorResponse {
     private LocalTime startTime;
 
     private LocalTime endTime;
-
+    @Valid
     private Address bookingAddress;
 }

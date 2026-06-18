@@ -38,7 +38,7 @@ public class ServiceCategoryController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
-    @PutMapping("/services/{id}")
+    @PatchMapping("/services/{id}")
     public ResponseEntity<ApiResponse<ServiceCategory>> updateService(@PathVariable Long id,
                                                                       @RequestBody ServiceCategory updatedService){
         return new ResponseEntity<>(

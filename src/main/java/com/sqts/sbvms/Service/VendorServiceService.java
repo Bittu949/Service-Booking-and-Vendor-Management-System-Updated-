@@ -53,6 +53,7 @@ public class VendorServiceService {
         Vendor vendor = new Vendor();
         vendor.setUser(user);
         vendor.setStatus(VendorStatus.ACTIVE);
+        vendor.setVendorAddress(request.getVendorAddress());
         vendorRepository.save(vendor);
 
         VendorCreationResponse response = new VendorCreationResponse();
@@ -60,6 +61,7 @@ public class VendorServiceService {
         response.setEmail(user.getEmail());
         response.setRole(user.getRole());
         response.setVendorId(vendor.getId());
+        response.setVendorAddress(vendor.getVendorAddress());
 
         return response;
     }
@@ -117,6 +119,7 @@ public class VendorServiceService {
             vendorDetails.setVendorName(vendor.getUser().getName());
             vendorDetails.setVendorEmail(vendor.getUser().getEmail());
             vendorDetails.setVendorServiceDetails(serviceDetails);
+            vendorDetails.setVendorAddress(vendor.getVendorAddress());
             vendorDetailsList.add(vendorDetails);
         }
         return vendorDetailsList;
@@ -135,6 +138,7 @@ public class VendorServiceService {
             vendorServiceDetailsList.add(vendorServiceDetails);
         }
         displayVendorDetails.setVendorServiceDetails(vendorServiceDetailsList);
+        displayVendorDetails.setVendorAddress(vendor.getVendorAddress());
         return displayVendorDetails;
     }
     public DisplayVendorDetails displayVendor(Long id) {
@@ -160,19 +164,26 @@ public class VendorServiceService {
         displayVendorDetails.setVendorEmail(email);
         displayVendorDetails.setVendorServiceDetails(serviceDetails);
         displayVendorDetails.setVendorStatus(vendor.getStatus());
+        displayVendorDetails.setVendorAddress(vendor.getVendorAddress());
         return displayVendorDetails;
     }
     public VendorUpdateResponse updateVendor(Long vendorId, VendorUpdateRequest request){
         Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new VendorNotFoundException("Vendor not found."));
-        vendor.getUser().setName(request.getVendorName());
-        vendor.getUser().setEmail(request.getVendorEmail());
-        vendor.getUser().setPassword(request.getPassword());
+        if(request.getVendorName() != null)
+            vendor.getUser().setName(request.getVendorName());
+        if(request.getVendorEmail() != null)
+            vendor.getUser().setEmail(request.getVendorEmail());
+        if(request.getPassword() != null)
+            vendor.getUser().setPassword(request.getPassword());
+        if(request.getVendorAddress() != null)
+            vendor.setVendorAddress(request.getVendorAddress());
         vendorRepository.save(vendor);
         VendorUpdateResponse response = new VendorUpdateResponse();
         response.setVendorId(vendor.getId());
         response.setVendorName(vendor.getUser().getName());
         response.setVendorEmail(vendor.getUser().getEmail());
+        response.setVendorAddress(vendor.getVendorAddress());
         return response;
     }
     public VendorDeletionResponse deleteVendor(Long vendorId){
@@ -234,6 +245,7 @@ public class VendorServiceService {
             searchResponse.setServiceName(service.getServiceCategory().getServiceName());
             searchResponse.setPrice(service.getPrice());
             searchResponse.setDuration(service.getDuration());
+            searchResponse.setVendorAddress(service.getVendor().getVendorAddress());
             responses.add(searchResponse);
         }
         return responses;
@@ -248,12 +260,13 @@ public class VendorServiceService {
             throw new ServiceAssignmentNotFoundException("Service assignment not found.");
 
         SearchResponse response = new SearchResponse();
-        response.setVendorId(vendor.getUser().getId());
+        response.setVendorId(vendor.getId());
         response.setVendorName(vendor.getUser().getName());
         response.setVendorEmail(vendor.getUser().getEmail());
         response.setServiceName(service.getServiceName());
         response.setPrice(vendorService.getPrice());
         response.setDuration(vendorService.getDuration());
+        response.setVendorAddress(vendor.getVendorAddress());
         return response;
     }
     public VendorSummaryResponse viewDashboardSummary(Long vendorId){
@@ -266,6 +279,7 @@ public class VendorServiceService {
         response.setVendorEmail(vendor.getUser().getEmail());
         response.setTotalAssignedServices(count);
         response.setStatus(vendor.getStatus());
+        response.setVendorAddress(vendor.getVendorAddress());
         return response;
     }
     public Long countTotalVendors(){

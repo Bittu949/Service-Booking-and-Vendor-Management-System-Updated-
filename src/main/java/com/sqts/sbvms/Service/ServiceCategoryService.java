@@ -84,6 +84,7 @@ public class ServiceCategoryService {
             response.setVendorEmail(vendorService.getVendor().getUser().getEmail());
             response.setPrice(vendorService.getPrice());
             response.setDuration(vendorService.getDuration());
+            response.setVendorAddress(vendorService.getVendor().getVendorAddress());
             vendorByServiceResponses.add(response);
         }
         return vendorByServiceResponses;

@@ -3,6 +3,7 @@ package com.sqts.sbvms.Dto;
 import com.sqts.sbvms.Enum.BookingStatus;
 import com.sqts.sbvms.Model.Address;
 import com.sqts.sbvms.Model.TimeSlot;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,8 @@ public class BookingDetailsResponse {
     private String customerName;
     private Long vendorId;
     private String vendorName;
+    @Valid
     private Address vendorAddress;
+    @Valid
     private Address bookingAddress;
 }

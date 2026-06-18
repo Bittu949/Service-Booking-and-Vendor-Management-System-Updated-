@@ -1,6 +1,8 @@
 package com.sqts.sbvms.Dto;
 
 import com.sqts.sbvms.Enum.Role;
+import com.sqts.sbvms.Model.Address;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,4 +19,6 @@ public class VendorCreationResponse {
     private String name;
     private String email;
     private Role role;
+    @Valid
+    private Address vendorAddress;
 }

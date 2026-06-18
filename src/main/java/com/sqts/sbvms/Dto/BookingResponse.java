@@ -5,6 +5,7 @@ import com.sqts.sbvms.Model.Address;
 import com.sqts.sbvms.Model.TimeSlot;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,5 +24,6 @@ public class BookingResponse {
     private LocalDate bookingDate;
     private TimeSlot timeSlot;
     private BookingStatus status;
+    @Valid
     private Address bookingAddress;
 }

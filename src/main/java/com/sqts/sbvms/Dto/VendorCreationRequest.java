@@ -1,6 +1,8 @@
 package com.sqts.sbvms.Dto;
 
+import com.sqts.sbvms.Model.Address;
 import jakarta.persistence.Column;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -23,4 +25,7 @@ public class VendorCreationRequest {
     private String email;
     @NotBlank
     private String password;
+    @Valid
+    @NotNull
+    private Address vendorAddress;
 }

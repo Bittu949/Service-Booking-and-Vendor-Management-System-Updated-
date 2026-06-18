@@ -4,6 +4,7 @@ import com.sqts.sbvms.Enum.BookingStatus;
 import com.sqts.sbvms.Model.Address;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,5 +25,6 @@ public class PendingBookingResponse {
     private LocalTime startTime;
     private LocalTime endTime;
     private BookingStatus status;
+    @Valid
     private Address bookingAddress;
 }

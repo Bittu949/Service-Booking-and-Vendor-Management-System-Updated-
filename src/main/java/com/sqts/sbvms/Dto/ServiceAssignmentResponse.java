@@ -2,6 +2,7 @@ package com.sqts.sbvms.Dto;
 
 import com.sqts.sbvms.Entity.ServiceCategory;
 import com.sqts.sbvms.Entity.Vendor;
+import com.sqts.sbvms.Model.Address;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

@@ -1,5 +1,7 @@
 package com.sqts.sbvms.Dto;
 
+import com.sqts.sbvms.Model.Address;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,4 +19,6 @@ public class VendorByServiceResponse {
     private String vendorEmail;
     private Long price;
     private Duration duration;
+    @Valid
+    private Address vendorAddress;
 }
