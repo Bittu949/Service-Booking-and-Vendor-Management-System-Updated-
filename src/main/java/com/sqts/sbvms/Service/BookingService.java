@@ -79,8 +79,7 @@ public class BookingService {
         }
         return pendingBookings;
     }
-    //Note: Need to look if address based vendor displaying need to be implemented or not
-    public List<AvailableVendorResponse> getAvailableVendorsForBooking(Long bookingId){
+    public List<AvailableVendorResponse> getAvailableVendorsForBooking(Long bookingId, boolean nearby){
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new BookingNotFoundException("Booking not found."));
 
         if(booking.getStatus() != BookingStatus.PENDING)
@@ -98,9 +97,14 @@ public class BookingService {
         //Filtering only those vendor services whose vendors are active
         vendorServices = vendorServices.stream().filter(v -> v.getVendor().getStatus() == VendorStatus.ACTIVE).toList();
 
+        //Check if nearby vendors only needed
+        if(nearby)
+            vendorServices = vendorServices.stream().filter(v -> v.getVendor().getVendorAddress().getPincode().equals(booking.getBookingAddress().getPincode())).toList();
+
         for(VendorService vendorService : vendorServices){
             List<Booking> vendorBookings =
                     bookingRepository.findByVendorServiceVendorId(vendorService.getVendor().getId());
+
             boolean hasOverlap = vendorBookings.stream()
                     .filter(b -> b.getStatus() == BookingStatus.CONFIRMED)
                     .filter(b -> b.getBookingDate().equals(bookingDate))

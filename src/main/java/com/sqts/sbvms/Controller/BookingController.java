@@ -39,8 +39,13 @@ public class BookingController {
                 HttpStatus.OK);
     }
     @GetMapping("/bookings/{bookingId}/available-vendors")
-    public ResponseEntity<ApiResponse<List<AvailableVendorResponse>>> getAvailableVendorsForBooking(@PathVariable(name = "bookingId") Long bookingId){
-        List<AvailableVendorResponse> availableVendors = bookingService.getAvailableVendorsForBooking(bookingId);
+    public ResponseEntity<ApiResponse<List<AvailableVendorResponse>>> getAvailableVendorsForBooking(@PathVariable(name = "bookingId")
+                                                                                                        Long bookingId,
+                                                                                                    @RequestParam(name = "nearby",
+                                                                                                            required = false,
+                                                                                                            defaultValue = "false")
+                                                                                                    boolean nearby){
+        List<AvailableVendorResponse> availableVendors = bookingService.getAvailableVendorsForBooking(bookingId, nearby);
         return new ResponseEntity<>(
                 new ApiResponse<>(
                         true,
