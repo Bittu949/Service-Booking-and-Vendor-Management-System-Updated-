@@ -89,4 +89,7 @@ public class ServiceCategoryService {
         }
         return vendorByServiceResponses;
     }
+    public Long countTotalServices(){
+        return serviceCategoryRepository.count();
+    }
 }

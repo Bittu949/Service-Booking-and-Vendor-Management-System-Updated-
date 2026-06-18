@@ -40,7 +40,7 @@ public class ServiceCategoryController {
     }
     @PatchMapping("/services/{id}")
     public ResponseEntity<ApiResponse<ServiceCategory>> updateService(@PathVariable Long id,
-                                                                      @RequestBody ServiceCategory updatedService){
+                                                                      @Valid @RequestBody ServiceCategory updatedService){
         return new ResponseEntity<>(
                 new ApiResponse<>(
                         true,
@@ -82,5 +82,14 @@ public class ServiceCategoryController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
-
+    @GetMapping("/services/count")
+    public ResponseEntity<ApiResponse<Long>> countTotalServices(){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Data found",
+                        serviceCategoryService.countTotalServices(),
+                        LocalDateTime.now()),
+                HttpStatus.OK);
+    }
 }

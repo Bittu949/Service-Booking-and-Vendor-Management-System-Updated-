@@ -157,16 +157,6 @@ public class VendorServiceController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
-    @GetMapping("/services/count")
-    public ResponseEntity<ApiResponse<Long>> countTotalServices(){
-        return new ResponseEntity<>(
-                new ApiResponse<>(
-                        true,
-                        "Data found",
-                        vendorServiceService.countTotalServices(),
-                        LocalDateTime.now()),
-                HttpStatus.OK);
-    }
     @GetMapping("/vendor/{vendorId}/services/{serviceId}/exists")
     public ResponseEntity<ApiResponse<Boolean>> checkVendorHasService(@PathVariable("vendorId") Long vendorId,
                                                                       @PathVariable("serviceId") Long serviceId){
