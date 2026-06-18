@@ -1,7 +1,7 @@
 package com.sqts.sbvms.Enum;
 
 public enum Role {
-    USER,
+    CUSTOMER,
     ADMIN,
     VENDOR
 }
