@@ -115,9 +115,9 @@ public class VendorServiceController {
                 HttpStatus.OK);
     }
     @GetMapping("/vendors/search")
-    public ResponseEntity<ApiResponse<List<SearchResponse>>> searchByVendorOrService(@RequestParam(required = false) String vendorName,
-                                                                                        @RequestParam(required = false) String serviceName){
-        List<SearchResponse> responses = vendorServiceService.searchByVendorOrService(vendorName, serviceName);
+    public ResponseEntity<ApiResponse<List<SearchResponse>>> searchVendorServicesByVendorOrService(@RequestParam(name = "vendorName", required = false) String vendorName,
+                                                                                        @RequestParam(name = "serviceName", required = false) String serviceName){
+        List<SearchResponse> responses = vendorServiceService.searchVendorServicesByVendorOrService(vendorName, serviceName);
         return new ResponseEntity<>(
                 new ApiResponse<>(
                         true,

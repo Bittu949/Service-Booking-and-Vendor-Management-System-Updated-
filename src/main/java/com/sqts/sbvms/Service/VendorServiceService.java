@@ -118,6 +118,7 @@ public class VendorServiceService {
             DisplayVendorDetails vendorDetails = new DisplayVendorDetails();
             vendorDetails.setVendorName(vendor.getUser().getName());
             vendorDetails.setVendorEmail(vendor.getUser().getEmail());
+            vendorDetails.setVendorStatus(vendor.getStatus());
             vendorDetails.setVendorServiceDetails(serviceDetails);
             vendorDetails.setVendorAddress(vendor.getVendorAddress());
             vendorDetailsList.add(vendorDetails);
@@ -221,7 +222,7 @@ public class VendorServiceService {
         response.setDuration(vendorService.getDuration());
         return response;
     }
-    public List<SearchResponse> searchByVendorOrService(String vendorName, String serviceName){
+    public List<SearchResponse> searchVendorServicesByVendorOrService(String vendorName, String serviceName){
         List<VendorService> vendorServices = vendorServiceRepository.findAll();
         List<SearchResponse> responses = new ArrayList<>();
 
@@ -229,14 +230,14 @@ public class VendorServiceService {
                 .filter(v -> v.getVendor().getStatus() == VendorStatus.ACTIVE)
                 .toList();
 
-        if(vendorName != null)
+        if(vendorName != null && !vendorName.isBlank())
             vendorServices = vendorServices.stream().filter(v -> v.getVendor().getUser() != null &&
                                                                  v.getVendor().getUser().getName() != null &&
-                                                                 v.getVendor().getUser().getName().toLowerCase().contains(vendorName.toLowerCase())).toList();
-        if(serviceName != null)
+                                                                 v.getVendor().getUser().getName().trim().toLowerCase().contains(vendorName.trim().toLowerCase())).toList();
+        if(serviceName != null && !serviceName.isBlank())
             vendorServices = vendorServices.stream().filter(v -> v.getServiceCategory() != null &&
                                                                  v.getServiceCategory().getServiceName() != null &&
-                                                                 v.getServiceCategory().getServiceName().toLowerCase().contains(serviceName.toLowerCase())).toList();
+                                                                 v.getServiceCategory().getServiceName().trim().toLowerCase().contains(serviceName.trim().toLowerCase())).toList();
         for(VendorService service : vendorServices){
             SearchResponse searchResponse = new SearchResponse();
             searchResponse.setVendorId(service.getVendor().getId());
