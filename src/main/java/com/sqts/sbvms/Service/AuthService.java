@@ -8,9 +8,12 @@ import com.sqts.sbvms.Exception.InvalidInputException;
 import com.sqts.sbvms.Exception.UserAlreadyExistsException;
 import com.sqts.sbvms.Exception.UserNotFoundException;
 import com.sqts.sbvms.Repository.UserRepository;
+import com.sqts.sbvms.Security.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,12 +22,15 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       AuthenticationManager authenticationManager){
+                       AuthenticationManager authenticationManager,
+                       JwtService jwtService){
         this.userRepository =  userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
     public String register(RegisterRequest request){
         User user = userRepository.findByEmail(request.getEmail());
@@ -48,8 +54,8 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
                         request.getPassword());
-        authenticationManager.authenticate(authentication);
-
-        return "User logged-in successfully.";
+        Authentication authenticatedUser = authenticationManager.authenticate(authentication);
+        UserDetails userDetails = ((UserDetails) authenticatedUser.getPrincipal());
+        return jwtService.generateToken(userDetails);
     }
 }
