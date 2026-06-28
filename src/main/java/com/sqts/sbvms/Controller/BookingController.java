@@ -130,4 +130,22 @@ public class BookingController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
+    @GetMapping("/me/bookings")
+    public ResponseEntity<ApiResponse<List<BookingHistoryResponse>>> getMyBookings() {
+
+        List<BookingHistoryResponse> bookingHistory =
+                bookingService.getMyBookings();
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        bookingHistory.isEmpty()
+                                ? "Bookings not found."
+                                : "Bookings found.",
+                        bookingHistory,
+                        LocalDateTime.now()
+                ),
+                HttpStatus.OK
+        );
+    }
 }

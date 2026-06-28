@@ -6,6 +6,7 @@ import com.sqts.sbvms.Entity.VendorService;
 import com.sqts.sbvms.Exception.*;
 import com.sqts.sbvms.Repository.ServiceCategoryRepository;
 import com.sqts.sbvms.Repository.VendorServiceRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import java.util.Optional;
 public class ServiceCategoryService {
     ServiceCategoryRepository serviceCategoryRepository;
     VendorServiceRepository vendorServiceRepository;
+    SecurityContextHolder contextHolder;
     public ServiceCategoryService(ServiceCategoryRepository serviceCategoryRepository,
                                   VendorServiceRepository vendorServiceRepository) {
         this.serviceCategoryRepository = serviceCategoryRepository;

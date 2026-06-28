@@ -6,7 +6,10 @@ import com.sqts.sbvms.Enum.BookingStatus;
 import com.sqts.sbvms.Enum.VendorStatus;
 import com.sqts.sbvms.Exception.*;
 import com.sqts.sbvms.Repository.*;
+import com.sqts.sbvms.Security.CustomUserDetails;
 import lombok.Getter;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -312,5 +315,18 @@ public class BookingService {
     }
     public Long getBookingsCount(){
         return bookingRepository.count();
+    }
+    public List<BookingHistoryResponse> getMyBookings() {
+
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+        CustomUserDetails userDetails =
+                (CustomUserDetails) authentication.getPrincipal();
+
+        Long customerId = userDetails.getId();
+
+        return getCustomerBookingHistory(customerId);
     }
 }
