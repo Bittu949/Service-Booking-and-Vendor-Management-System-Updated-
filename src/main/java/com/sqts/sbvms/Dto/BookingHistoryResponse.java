@@ -8,7 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @NoArgsConstructor
@@ -28,4 +30,8 @@ public class BookingHistoryResponse {
     private Address bookingAddress;
     @Valid
     private Address vendorAddress;
+    Long finalPrice;
+    Duration estimatedDuration;
+    private LocalDateTime assignedAt;
+    private LocalDateTime completedAt;
 }

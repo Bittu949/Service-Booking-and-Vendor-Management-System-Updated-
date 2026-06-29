@@ -7,12 +7,12 @@ import com.sqts.sbvms.Enum.VendorStatus;
 import com.sqts.sbvms.Exception.*;
 import com.sqts.sbvms.Repository.*;
 import com.sqts.sbvms.Security.CustomUserDetails;
-import lombok.Getter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -103,6 +103,10 @@ public class BookingService {
             response.setVendorId(booking.getVendorService().getVendor().getId());
             response.setVendorName(booking.getVendorService().getVendor().getUser().getName());
             response.setVendorAddress(booking.getVendorService().getVendor().getVendorAddress());
+            response.setFinalPrice(booking.getFinalPrice());
+            response.setEstimatedDuration(booking.getEstimatedDuration());
+            response.setAssignedAt(booking.getAssignedAt());
+            response.setCompletedAt(booking.getCompletedAt());
         }
 
         return response;
@@ -120,6 +124,59 @@ public class BookingService {
                         new VendorNotFoundException("Vendor not found."));
 
         return getVendorBookingHistory(vendor.getId());
+    }
+    public UpdateBookingStatusResponse updateMyBookingStatus(
+            Long bookingId,
+            UpdateBookingStatusRequest request){
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        CustomUserDetails userDetails =
+                (CustomUserDetails) authentication.getPrincipal();
+
+        Vendor vendor = vendorRepository.findByUserId(userDetails.getId())
+                .orElseThrow(() ->
+                        new VendorNotFoundException("Vendor not found."));
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() ->
+                        new BookingNotFoundException("Booking not found."));
+
+        if(booking.getVendorService() == null)
+            throw new InvalidBookingStateException(
+                    "No vendor assigned to this booking.");
+
+        if(!booking.getVendorService().getVendor().getId().equals(vendor.getId()))
+            throw new UnauthorizedAccessException(
+                    "You are not authorized to update this booking.");
+
+        if(booking.getStatus() != BookingStatus.CONFIRMED)
+            throw new InvalidBookingStateException(
+                    "Only confirmed bookings can be updated by vendors.");
+
+        if(request.getStatus() != BookingStatus.COMPLETED &&
+                request.getStatus() != BookingStatus.CANCELLED)
+            throw new InvalidBookingStateException(
+                    "Vendor can only update booking status to COMPLETED or CANCELLED.");
+
+        UpdateBookingStatusResponse response =
+                new UpdateBookingStatusResponse();
+
+        response.setBookingId(booking.getId());
+        response.setPreviousStatus(booking.getStatus());
+
+        booking.setStatus(request.getStatus());
+
+        if(request.getStatus() == BookingStatus.COMPLETED){
+            booking.setCompletedAt(LocalDateTime.now());
+        }
+
+        bookingRepository.save(booking);
+
+        response.setCurrentStatus(booking.getStatus());
+
+        return response;
     }
     public List<PendingBookingResponse> getPendingBookings(){
         List<PendingBookingResponse> pendingBookings = new ArrayList<>();
@@ -223,6 +280,9 @@ public class BookingService {
 
         booking.setStatus(BookingStatus.CONFIRMED);
         booking.setVendorService(vendorService);
+        booking.setFinalPrice(vendorService.getPrice());
+        booking.setEstimatedDuration(vendorService.getDuration());
+        booking.setAssignedAt(LocalDateTime.now());
         bookingRepository.save(booking);
 
         AssignVendorResponse response = new AssignVendorResponse();
@@ -236,6 +296,8 @@ public class BookingService {
         response.setEndTime(booking.getTimeSlot().getEndTime());
         response.setBookingAddress(booking.getBookingAddress());
         response.setVendorAddress(booking.getVendorService().getVendor().getVendorAddress());
+        response.setFinalPrice(booking.getFinalPrice());
+        response.setEstimatedDuration(booking.getEstimatedDuration());
 
         return response;
     }
@@ -256,6 +318,10 @@ public class BookingService {
             response.setVendorId(booking.getVendorService().getVendor().getId());
             response.setVendorName(booking.getVendorService().getVendor().getUser().getName());
             response.setVendorAddress(booking.getVendorService().getVendor().getVendorAddress());
+            response.setFinalPrice(booking.getFinalPrice());
+            response.setEstimatedDuration(booking.getEstimatedDuration());
+            response.setAssignedAt(booking.getAssignedAt());
+            response.setCompletedAt(booking.getCompletedAt());
         }
 
         return response;
@@ -283,37 +349,41 @@ public class BookingService {
                 bookingHistoryResponse.setVendorId(vendor.getId());
                 bookingHistoryResponse.setVendorName(vendor.getUser().getName());
                 bookingHistoryResponse.setVendorAddress(vendor.getVendorAddress());
+                bookingHistoryResponse.setFinalPrice(booking.getFinalPrice());
+                bookingHistoryResponse.setEstimatedDuration(booking.getEstimatedDuration());
+                bookingHistoryResponse.setAssignedAt(booking.getAssignedAt());
+                bookingHistoryResponse.setCompletedAt(booking.getCompletedAt());
             }
             responses.add(bookingHistoryResponse);
         }
         return responses;
     }
-    public UpdateBookingStatusResponse updateBookingStatus(Long bookingId, UpdateBookingStatusRequest request){
+    public UpdateBookingStatusResponse updateBookingStatus(
+            Long bookingId,
+            UpdateBookingStatusRequest request) {
+
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new BookingNotFoundException("Booking not found."));
+                .orElseThrow(() ->
+                        new BookingNotFoundException("Booking not found."));
 
-        if(booking.getStatus() == BookingStatus.COMPLETED || booking.getStatus() == BookingStatus.CANCELLED)
-            throw new InvalidBookingStateException("Booking status is already "+booking.getStatus());
-
-        if(booking.getStatus() == BookingStatus.PENDING && request.getStatus() != BookingStatus.CANCELLED)
-            throw new InvalidBookingStateException("Cannot change status "+request.getStatus()+" for PENDING bookings.");
-
-        if (booking.getStatus() == BookingStatus.CONFIRMED &&
-                request.getStatus() != BookingStatus.COMPLETED &&
-                request.getStatus() != BookingStatus.CANCELLED) {
-
+        if (booking.getStatus() != BookingStatus.PENDING)
             throw new InvalidBookingStateException(
-                    "Cannot change status " + request.getStatus() + " for CONFIRMED bookings.");
-        }
+                    "Only pending bookings can be updated by the administrator.");
+
+        if (request.getStatus() != BookingStatus.CANCELLED)
+            throw new InvalidBookingStateException(
+                    "Administrator can only cancel pending bookings.");
 
         UpdateBookingStatusResponse response = new UpdateBookingStatusResponse();
+
         response.setBookingId(booking.getId());
         response.setPreviousStatus(booking.getStatus());
 
-        booking.setStatus(request.getStatus());
+        booking.setStatus(BookingStatus.CANCELLED);
         bookingRepository.save(booking);
 
         response.setCurrentStatus(booking.getStatus());
+
         return response;
     }
     public List<VendorBookingHistoryResponse> getVendorBookingHistory(Long vendorId){
@@ -332,6 +402,10 @@ public class BookingService {
             bookingHistoryResponse.setDate(booking.getBookingDate());
             bookingHistoryResponse.setTimeSlot(booking.getTimeSlot());
             bookingHistoryResponse.setBookingAddress(booking.getBookingAddress());
+            bookingHistoryResponse.setFinalPrice(booking.getFinalPrice());
+            bookingHistoryResponse.setEstimatedDuration(booking.getEstimatedDuration());
+            bookingHistoryResponse.setAssignedAt(booking.getAssignedAt());
+            bookingHistoryResponse.setCompletedAt(booking.getCompletedAt());
 
             responses.add(bookingHistoryResponse);
         }
@@ -357,6 +431,10 @@ public class BookingService {
                 response.setVendorId(vendor.getId());
                 response.setVendorName(vendor.getUser().getName());
                 response.setVendorAddress(vendor.getVendorAddress());
+                response.setFinalPrice(booking.getFinalPrice());
+                response.setEstimatedDuration(booking.getEstimatedDuration());
+                response.setAssignedAt(booking.getAssignedAt());
+                response.setCompletedAt(booking.getCompletedAt());
             }
             response.setBookingId(booking.getId());
             response.setBookingStatus(booking.getStatus());

@@ -9,7 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,4 +26,8 @@ public class VendorBookingHistoryResponse {
     private BookingStatus bookingStatus;
     @Valid
     private Address bookingAddress;
+    private Long finalPrice;
+    private Duration estimatedDuration;
+    private LocalDateTime assignedAt;
+    private LocalDateTime completedAt;
 }

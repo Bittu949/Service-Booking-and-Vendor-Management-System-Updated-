@@ -59,6 +59,21 @@ public class BookingController {
                 HttpStatus.OK
         );
     }
+    @PatchMapping("/me/bookings/{bookingId}/status")
+    public ResponseEntity<ApiResponse<UpdateBookingStatusResponse>> updateMyBookingStatus(
+            @PathVariable Long bookingId,
+            @RequestBody UpdateBookingStatusRequest request){
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Booking status updated.",
+                        bookingService.updateMyBookingStatus(bookingId, request),
+                        LocalDateTime.now()
+                ),
+                HttpStatus.OK
+        );
+    }
     @GetMapping("/bookings/pending")
     public ResponseEntity<ApiResponse<List<PendingBookingResponse>>> getPendingBookings(){
         List<PendingBookingResponse> pendingBookings = bookingService.getPendingBookings();
