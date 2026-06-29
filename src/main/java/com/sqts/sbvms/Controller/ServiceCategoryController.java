@@ -1,7 +1,6 @@
 package com.sqts.sbvms.Controller;
 
 import com.sqts.sbvms.Dto.*;
-import com.sqts.sbvms.Entity.ServiceCategory;
 import com.sqts.sbvms.Service.ServiceCategoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -62,12 +61,12 @@ public class ServiceCategoryController {
                 HttpStatus.OK);
     }
     @GetMapping("/services/{id}")
-    public ResponseEntity<ApiResponse<ServiceCategoryResponse>> getSingleServices(@PathVariable(name = "id") Long serviceId){
+    public ResponseEntity<ApiResponse<ServiceCategoryResponse>> getServiceById(@PathVariable(name = "id") Long serviceId){
         return new ResponseEntity<>(
                 new ApiResponse<>(
                         true,
                         "Service found.",
-                        serviceCategoryService.getSingleServices(serviceId),
+                        serviceCategoryService.getServiceById(serviceId),
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }

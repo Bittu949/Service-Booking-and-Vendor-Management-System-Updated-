@@ -16,13 +16,11 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ServiceCategoryService {
-    ServiceCategoryRepository serviceCategoryRepository;
-    VendorServiceRepository vendorServiceRepository;
-    SecurityContextHolder contextHolder;
+    private final ServiceCategoryRepository serviceCategoryRepository;
+    private final VendorServiceRepository vendorServiceRepository;
     public ServiceCategoryService(ServiceCategoryRepository serviceCategoryRepository,
                                   VendorServiceRepository vendorServiceRepository) {
         this.serviceCategoryRepository = serviceCategoryRepository;
@@ -123,7 +121,7 @@ public class ServiceCategoryService {
 
         return response;
     }
-    public ServiceCategoryResponse getSingleServices(Long serviceId){
+    public ServiceCategoryResponse getServiceById(Long serviceId){
 
         ServiceCategory service = serviceCategoryRepository.findById(serviceId)
                 .orElseThrow(() ->
@@ -153,10 +151,19 @@ public class ServiceCategoryService {
         if(maxPrice != null)
             vendorServices = new ArrayList<>(vendorServices.stream().filter(v -> v.getPrice() <= maxPrice).toList());
 
-        if(sortBy != null && sortBy.equalsIgnoreCase("price"))
-            vendorServices.sort(Comparator.comparing(VendorService::getPrice));
-        if(sortBy != null && sortBy.equalsIgnoreCase("name"))
-            vendorServices.sort(Comparator.comparing(v -> v.getVendor().getUser().getName()));
+        if (sortBy != null) {
+            if (sortBy.equalsIgnoreCase("price")) {
+                vendorServices.sort(Comparator.comparing(VendorService::getPrice));
+            }
+            else if (sortBy.equalsIgnoreCase("name")) {
+                vendorServices.sort(
+                        Comparator.comparing(v -> v.getVendor().getUser().getName()));
+            }
+            else {
+                throw new InvalidInputException(
+                        "sortBy must be either 'price' or 'name'.");
+            }
+        }
 
         List<VendorByServiceResponse> vendorByServiceResponses = new ArrayList<>();
         for(VendorService vendorService : vendorServices){
