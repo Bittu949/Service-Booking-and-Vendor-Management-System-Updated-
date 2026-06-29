@@ -33,7 +33,7 @@ public class SecurityConfig {
                                                    JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/auth/register", "/auth/login").permitAll()
+                    .requestMatchers("/auth/register", "/auth/login", "/vendor/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/services/**/vendors").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/services").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/services/**").hasAuthority("ROLE_ADMIN")
@@ -66,6 +66,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/bookings").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/bookings/count").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/me/bookings").hasAuthority("ROLE_CUSTOMER")
+                        .requestMatchers(HttpMethod.GET, "/vendors/pending").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/vendors/*/verification").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/vendors/*/approve").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/vendors/*/reject").hasAuthority("ROLE_ADMIN")
                     .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter,

@@ -3,6 +3,7 @@ package com.sqts.sbvms.Entity;
 import com.sqts.sbvms.Enum.VendorStatus;
 import com.sqts.sbvms.Model.Address;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,4 +33,20 @@ public class Vendor {
     private VendorStatus status;
     @Embedded
     Address vendorAddress;
+    @NotNull
+    private Integer experienceYears;
+    @Column(length = 1000)
+    private String description;
+    @NotBlank
+    @Column(unique = true)
+    private String phoneNumber;
+    @NotNull
+    @Column(unique = true)
+    private String aadhaarNumber;
+    @NotNull
+    private String aadhaarFrontImage;
+    @NotNull
+    private String aadhaarBackImage;
+    @NotNull
+    private String verificationDocument;
 }

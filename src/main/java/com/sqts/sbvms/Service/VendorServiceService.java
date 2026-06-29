@@ -13,6 +13,7 @@ import com.sqts.sbvms.Repository.UserRepository;
 import com.sqts.sbvms.Repository.VendorRepository;
 import com.sqts.sbvms.Repository.VendorServiceRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -26,44 +27,88 @@ public class VendorServiceService {
     private final UserRepository userRepository;
     private final ServiceCategoryRepository serviceCategoryRepository;
     private final VendorServiceRepository vendorServiceRepository;
+    private final PasswordEncoder passwordEncoder;
     public VendorServiceService(VendorRepository vendorRepository,
                                 UserRepository userRepository,
                                 ServiceCategoryRepository serviceCategoryRepository,
-                                VendorServiceRepository vendorServiceRepository) {
+                                VendorServiceRepository vendorServiceRepository,
+                                PasswordEncoder passwordEncoder) {
         this.vendorRepository = vendorRepository;
         this.userRepository = userRepository;
         this.serviceCategoryRepository = serviceCategoryRepository;
         this.vendorServiceRepository = vendorServiceRepository;
+        this.passwordEncoder = passwordEncoder;
     }
-    public VendorCreationResponse createVendor(VendorCreationRequest request){
-        if(request == null)
+    public VendorRegistrationResponse registerVendor(VendorRegistrationRequest request) {
+        if (request == null)
             throw new InvalidInputException("Please fill all the details.");
-        if(request.getPassword().length() < 8)
+
+        if (request.getPassword().trim().length() < 8)
             throw new WeakPasswordException("Provided password is weak.");
-        if(userRepository.existsByEmail(request.getEmail().trim()))
+
+        if (userRepository.existsByEmail(request.getEmail().trim()))
             throw new UserAlreadyExistsException("Email already registered.");
+
+        if (vendorRepository.existsByPhoneNumber(request.getPhoneNumber().trim()))
+            throw new VendorAlreadyExistsException(
+                    "Phone number already registered.");
 
         User user = new User();
         user.setName(request.getName().trim());
         user.setEmail(request.getEmail().trim());
-        user.setPassword(request.getPassword().trim());
+        user.setPassword(passwordEncoder.encode(request.getPassword().trim()));
         user.setRole(Role.VENDOR);
+
         userRepository.save(user);
 
         Vendor vendor = new Vendor();
         vendor.setUser(user);
-        vendor.setStatus(VendorStatus.ACTIVE);
+        vendor.setStatus(VendorStatus.PENDING_APPROVAL);
         vendor.setVendorAddress(request.getVendorAddress());
+        vendor.setExperienceYears(request.getExperienceYears());
+        vendor.setDescription(request.getDescription());
+        vendor.setPhoneNumber(request.getPhoneNumber().trim());
+        vendor.setAadhaarNumber(request.getAadhaarNumber());
+        vendor.setAadhaarFrontImage(request.getAadhaarFrontImage());
+        vendor.setAadhaarBackImage(request.getAadhaarBackImage());
+        vendor.setVerificationDocument(request.getVerificationDocument());
+
         vendorRepository.save(vendor);
 
-        VendorCreationResponse response = new VendorCreationResponse();
-        response.setName(user.getName());
-        response.setEmail(user.getEmail());
-        response.setRole(user.getRole());
+        VendorRegistrationResponse response = new VendorRegistrationResponse();
         response.setVendorId(vendor.getId());
-        response.setVendorAddress(vendor.getVendorAddress());
+        response.setVendorName(user.getName());
+        response.setStatus(vendor.getStatus());
 
         return response;
+    }
+    public List<PendingVendorResponse> getPendingVendors() {
+
+        List<Vendor> vendors =
+                vendorRepository.findByStatus(VendorStatus.PENDING_APPROVAL);
+
+        if (vendors.isEmpty())
+            throw new NoVendorFoundException("No pending vendor requests found.");
+
+        List<PendingVendorResponse> responses = new ArrayList<>();
+
+        for (Vendor vendor : vendors) {
+
+            PendingVendorResponse response = new PendingVendorResponse();
+
+            response.setVendorId(vendor.getId());
+            response.setVendorName(vendor.getUser().getName());
+            response.setEmail(vendor.getUser().getEmail());
+            response.setPhoneNumber(vendor.getPhoneNumber());
+            response.setExperienceYears(vendor.getExperienceYears());
+            response.setDescription(vendor.getDescription());
+            response.setVendorAddress(vendor.getVendorAddress());
+            response.setStatus(vendor.getStatus());
+
+            responses.add(response);
+        }
+
+        return responses;
     }
     public ServiceAssignmentResponse assignServiceToVendor(ServiceAssignmentRequest request) {
         if(request == null)
@@ -168,6 +213,60 @@ public class VendorServiceService {
         displayVendorDetails.setVendorAddress(vendor.getVendorAddress());
         return displayVendorDetails;
     }
+    public VendorVerificationResponse getVendorVerificationDetails(Long vendorId) {
+
+        Vendor vendor = vendorRepository.findById(vendorId)
+                .orElseThrow(() ->
+                        new VendorNotFoundException("Vendor not found."));
+
+        VendorVerificationResponse response =
+                new VendorVerificationResponse();
+
+        response.setVendorId(vendor.getId());
+        response.setVendorName(vendor.getUser().getName());
+        response.setEmail(vendor.getUser().getEmail());
+        response.setPhoneNumber(vendor.getPhoneNumber());
+        response.setExperienceYears(vendor.getExperienceYears());
+        response.setDescription(vendor.getDescription());
+        response.setVendorAddress(vendor.getVendorAddress());
+
+        response.setAadhaarNumber(vendor.getAadhaarNumber());
+        response.setAadhaarFrontImage(vendor.getAadhaarFrontImage());
+        response.setAadhaarBackImage(vendor.getAadhaarBackImage());
+        response.setVerificationDocument(vendor.getVerificationDocument());
+
+        response.setStatus(vendor.getStatus());
+
+        return response;
+    }
+    public void approveVendor(Long vendorId){
+
+        Vendor vendor = vendorRepository.findById(vendorId)
+                .orElseThrow(() ->
+                        new VendorNotFoundException("Vendor not found."));
+
+        if(vendor.getStatus() != VendorStatus.PENDING_APPROVAL)
+            throw new InvalidVendorStatusException(
+                    "Only pending vendors can be approved.");
+
+        vendor.setStatus(VendorStatus.ACTIVE);
+
+        vendorRepository.save(vendor);
+    }
+    public void rejectVendor(Long vendorId){
+
+        Vendor vendor = vendorRepository.findById(vendorId)
+                .orElseThrow(() ->
+                        new VendorNotFoundException("Vendor not found."));
+
+        if(vendor.getStatus() != VendorStatus.PENDING_APPROVAL)
+            throw new InvalidVendorStatusException(
+                    "Only pending vendors can be rejected.");
+
+        vendor.setStatus(VendorStatus.REJECTED);
+
+        vendorRepository.save(vendor);
+    }
     public VendorUpdateResponse updateVendor(Long vendorId, VendorUpdateRequest request){
         Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new VendorNotFoundException("Vendor not found."));
@@ -175,16 +274,28 @@ public class VendorServiceService {
             vendor.getUser().setName(request.getVendorName());
         if(request.getVendorEmail() != null)
             vendor.getUser().setEmail(request.getVendorEmail());
-        if(request.getPassword() != null)
-            vendor.getUser().setPassword(request.getPassword());
+        if(request.getPassword() != null) {
+            if (request.getPassword().trim().length() < 8)
+                throw new WeakPasswordException("Provided password is weak.");
+            vendor.getUser().setPassword(passwordEncoder.encode(request.getPassword().trim()));
+        }
         if(request.getVendorAddress() != null)
             vendor.setVendorAddress(request.getVendorAddress());
+        if (request.getPhoneNumber() != null) {
+            String phone = request.getPhoneNumber().trim();
+            if (!phone.equals(vendor.getPhoneNumber())
+                    && vendorRepository.existsByPhoneNumber(phone)) {
+                throw new VendorAlreadyExistsException("Phone number already registered.");
+            }
+            vendor.setPhoneNumber(phone);
+        }
         vendorRepository.save(vendor);
         VendorUpdateResponse response = new VendorUpdateResponse();
         response.setVendorId(vendor.getId());
         response.setVendorName(vendor.getUser().getName());
         response.setVendorEmail(vendor.getUser().getEmail());
         response.setVendorAddress(vendor.getVendorAddress());
+        response.setPhoneNumber(vendor.getPhoneNumber());
         return response;
     }
     public VendorDeletionResponse deleteVendor(Long vendorId){
@@ -322,13 +433,5 @@ public class VendorServiceService {
         }
         return responses;
     }
-    public void updateVendorStatus(Long vendorId,
-                                   VendorStatusUpdateRequest request){
 
-        Vendor vendor = vendorRepository.findById(vendorId)
-                .orElseThrow(() ->
-                        new VendorNotFoundException("Vendor not found."));
-        vendor.setStatus(request.getStatus());
-        vendorRepository.save(vendor);
-    }
 }

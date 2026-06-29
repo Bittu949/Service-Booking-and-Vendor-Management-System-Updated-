@@ -82,7 +82,7 @@ public class GlobalExceptionHandler {
                         ex.getMessage(),
                         null,
                         LocalDateTime.now()),
-                HttpStatus.BAD_REQUEST);
+                HttpStatus.NOT_FOUND);
     }
     @ExceptionHandler(ServiceNotFoundException.class)
     public ResponseEntity<ApiResponse<Object>> handleServiceNotFoundException(ServiceNotFoundException ex){
@@ -92,7 +92,7 @@ public class GlobalExceptionHandler {
                         ex.getMessage(),
                         null,
                         LocalDateTime.now()),
-                HttpStatus.BAD_REQUEST);
+                HttpStatus.NOT_FOUND);
     }
     @ExceptionHandler(VendorNotFoundException.class)
     public ResponseEntity<ApiResponse<Object>> handleVendorNotFoundException(VendorNotFoundException ex){
@@ -102,7 +102,7 @@ public class GlobalExceptionHandler {
                         ex.getMessage(),
                         null,
                         LocalDateTime.now()),
-                HttpStatus.BAD_REQUEST);
+                HttpStatus.NOT_FOUND);
     }
     @ExceptionHandler(BookingsNotFoundException.class)
     public ResponseEntity<ApiResponse<Object>> handleBookingsNotFoundException(BookingsNotFoundException ex){
@@ -182,7 +182,7 @@ public class GlobalExceptionHandler {
                         ex.getMessage(),
                         null,
                         LocalDateTime.now()),
-                HttpStatus.BAD_REQUEST);
+                HttpStatus.NOT_FOUND);
     }
     @ExceptionHandler(InvalidVendorStatusException.class)
     public ResponseEntity<ApiResponse<Object>> handleInvalidVendorStatusException(InvalidVendorStatusException ex){
@@ -203,5 +203,45 @@ public class GlobalExceptionHandler {
                         null,
                         LocalDateTime.now()),
                 HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(VendorAccountInactiveException.class)
+    public ResponseEntity<ApiResponse<Object>> handleVendorAccountInactiveException(VendorAccountInactiveException ex){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        false,
+                        ex.getMessage(),
+                        null,
+                        LocalDateTime.now()),
+                HttpStatus.FORBIDDEN);
+    }
+    @ExceptionHandler(VendorAlreadyExistsException.class)
+    public ResponseEntity<ApiResponse<Object>> handleVendorAlreadyExistsException(VendorAlreadyExistsException ex){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        false,
+                        ex.getMessage(),
+                        null,
+                        LocalDateTime.now()),
+                HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(VendorApprovalPendingException.class)
+    public ResponseEntity<ApiResponse<Object>> handleVendorApprovalPendingException(VendorApprovalPendingException ex){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        false,
+                        ex.getMessage(),
+                        null,
+                        LocalDateTime.now()),
+                HttpStatus.FORBIDDEN);
+    }
+    @ExceptionHandler(VendorRegistrationRejectedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleVendorRegistrationRejectedException(VendorRegistrationRejectedException ex){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        false,
+                        ex.getMessage(),
+                        null,
+                        LocalDateTime.now()),
+                HttpStatus.FORBIDDEN);
     }
 }

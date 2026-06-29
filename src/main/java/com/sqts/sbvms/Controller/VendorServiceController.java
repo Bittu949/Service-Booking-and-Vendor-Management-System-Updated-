@@ -19,15 +19,82 @@ public class VendorServiceController {
     public VendorServiceController(VendorServiceService vendorServiceService) {
         this.vendorServiceService = vendorServiceService;
     }
-    @PostMapping("/vendor")
-    public ResponseEntity<ApiResponse<VendorCreationResponse>> createVendor(@Valid @RequestBody VendorCreationRequest request){
+    @PostMapping("/vendor/register")
+    public ResponseEntity<ApiResponse<VendorRegistrationResponse>> registerVendor(
+            @Valid @RequestBody VendorRegistrationRequest request){
         return new ResponseEntity<>(
                 new ApiResponse<>(
                         true,
-                        "Vendor created successfully.",
-                        vendorServiceService.createVendor(request),
-                        LocalDateTime.now()),
-                HttpStatus.CREATED);
+                        "Registration request submitted successfully. Please wait for admin approval.",
+                        vendorServiceService.registerVendor(request),
+                        LocalDateTime.now()
+                ),
+                HttpStatus.CREATED
+        );
+    }
+    @GetMapping("/vendors/pending")
+    public ResponseEntity<ApiResponse<List<PendingVendorResponse>>> getPendingVendors() {
+
+        List<PendingVendorResponse> responses =
+                vendorServiceService.getPendingVendors();
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        responses.isEmpty()
+                                ? "No pending vendor requests."
+                                : "Pending vendors found.",
+                        responses,
+                        LocalDateTime.now()
+                ),
+                HttpStatus.OK
+        );
+    }
+    @GetMapping("/vendors/{id}/verification")
+    public ResponseEntity<ApiResponse<VendorVerificationResponse>> getVendorVerificationDetails(
+            @PathVariable("id") Long vendorId) {
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Vendor details found.",
+                        vendorServiceService.getVendorVerificationDetails(vendorId),
+                        LocalDateTime.now()
+                ),
+                HttpStatus.OK
+        );
+    }
+    @PatchMapping("/vendors/{id}/approve")
+    public ResponseEntity<ApiResponse<String>> approveVendor(
+            @PathVariable("id") Long vendorId){
+
+        vendorServiceService.approveVendor(vendorId);
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Vendor approved successfully.",
+                        null,
+                        LocalDateTime.now()
+                ),
+                HttpStatus.OK
+        );
+    }
+    @PatchMapping("/vendors/{id}/reject")
+    public ResponseEntity<ApiResponse<String>> rejectVendor(
+            @PathVariable("id") Long vendorId){
+
+        vendorServiceService.rejectVendor(vendorId);
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Vendor registration rejected.",
+                        null,
+                        LocalDateTime.now()
+                ),
+                HttpStatus.OK
+        );
     }
     @PostMapping("/vendor/assignService")
     public ResponseEntity<ApiResponse<ServiceAssignmentResponse>> assignServiceToVendor(@Valid @RequestBody ServiceAssignmentRequest request){
@@ -179,21 +246,5 @@ public class VendorServiceController {
                         vendorServiceService.bulkServiceAssignment(vendorId, request),
                         LocalDateTime.now()),
                 HttpStatus.OK);
-    }
-    @PatchMapping("/vendor/{id}/status")
-    public ResponseEntity<ApiResponse<String>> updateVendorStatus(
-            @PathVariable("id") Long vendorId,
-            @Valid @RequestBody VendorStatusUpdateRequest request){
-
-        vendorServiceService.updateVendorStatus(vendorId, request);
-        return new ResponseEntity<>(
-                new ApiResponse<>(
-                        true,
-                        "Vendor status updated successfully.",
-                        null,
-                        LocalDateTime.now()
-                ),
-                HttpStatus.OK
-        );
     }
 }

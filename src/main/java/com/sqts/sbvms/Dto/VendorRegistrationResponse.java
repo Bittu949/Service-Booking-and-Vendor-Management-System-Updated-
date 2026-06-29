@@ -1,8 +1,8 @@
 package com.sqts.sbvms.Dto;
 
-import com.sqts.sbvms.Entity.Vendor;
-import com.sqts.sbvms.Model.Address;
-import jakarta.validation.Valid;
+import com.sqts.sbvms.Enum.VendorStatus;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,11 +12,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class VendorUpdateResponse {
+public class VendorRegistrationResponse {
     private Long vendorId;
     private String vendorName;
-    private String vendorEmail;
-    @Valid
-    private Address vendorAddress;
-    private String phoneNumber;
+    private VendorStatus status;
 }
