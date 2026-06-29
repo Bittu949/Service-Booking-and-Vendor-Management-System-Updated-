@@ -224,18 +224,6 @@ public class VendorServiceController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
-    @GetMapping("/vendor/{vendorId}/services/{serviceId}/exists")
-    public ResponseEntity<ApiResponse<Boolean>> checkVendorHasService(@PathVariable("vendorId") Long vendorId,
-                                                                      @PathVariable("serviceId") Long serviceId){
-        boolean hasService = vendorServiceService.checkVendorHasService(vendorId, serviceId);
-        return new ResponseEntity<>(
-                new ApiResponse<>(
-                        true,
-                        hasService ? "Data found" : "No data found",
-                        hasService,
-                        LocalDateTime.now()),
-                HttpStatus.OK);
-    }
     @PostMapping("/vendor/{id}/services/bulk")
     public ResponseEntity<ApiResponse<List<ServiceAssignmentResponse>>> bulkServiceAssignment(@PathVariable("id") Long vendorId,
                                                                       @RequestBody List<BulkServiceAssignmentRequest> request){
