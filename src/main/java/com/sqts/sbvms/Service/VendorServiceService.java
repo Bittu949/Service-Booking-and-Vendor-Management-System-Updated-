@@ -406,18 +406,56 @@ public class VendorServiceService {
     public Long countTotalVendors(){
         return vendorRepository.count();
     }
-    public List<ServiceAssignmentResponse> bulkServiceAssignment(Long vendorId, List<BulkServiceAssignmentRequest> requests){
-        Vendor vendor = vendorRepository.findById(vendorId).orElseThrow(() -> new VendorNotFoundException("Vendor not found."));
-        if(vendor.getStatus() != VendorStatus.ACTIVE)
+    public List<ServiceAssignmentResponse> bulkServiceAssignment(
+            Long vendorId,
+            List<BulkServiceAssignmentRequest> requests) {
+
+        Vendor vendor = vendorRepository.findById(vendorId)
+                .orElseThrow(() ->
+                        new VendorNotFoundException("Vendor not found."));
+
+        if (vendor.getStatus() != VendorStatus.ACTIVE)
             throw new InvalidVendorStatusException("Vendor is not active.");
+
+        List<ServiceCategory> serviceCategories = new ArrayList<>();
+
+        for (BulkServiceAssignmentRequest request : requests) {
+
+            ServiceCategory serviceCategory = serviceCategoryRepository
+                    .findById(request.getServiceCategoryId())
+                    .orElseThrow(() ->
+                            new ServiceNotFoundException("Service not found."));
+
+            if (vendorServiceRepository.existsByVendorIdAndServiceCategoryId(
+                    vendorId,
+                    serviceCategory.getId())) {
+
+                throw new DuplicateServiceAssignmentException(
+                        "Service '" + serviceCategory.getServiceName()
+                                + "' is already assigned to this vendor.");
+            }
+
+            if (serviceCategories.stream()
+                    .anyMatch(service -> service.getId().equals(serviceCategory.getId()))) {
+
+                throw new DuplicateServiceAssignmentException(
+                        "Duplicate service '" + serviceCategory.getServiceName()
+                                + "' found in the request.");
+            }
+
+            serviceCategories.add(serviceCategory);
+        }
+
         List<ServiceAssignmentResponse> responses = new ArrayList<>();
 
-        for(BulkServiceAssignmentRequest request : requests){
-            ServiceCategory service = serviceCategoryRepository.findById(request.getServiceCategoryId())
-                                                               .orElseThrow(() -> new ServiceNotFoundException("Service not found."));
+        for (int i = 0; i < requests.size(); i++) {
+
+            BulkServiceAssignmentRequest request = requests.get(i);
+            ServiceCategory serviceCategory = serviceCategories.get(i);
+
             VendorService vendorService = new VendorService();
             vendorService.setVendor(vendor);
-            vendorService.setServiceCategory(service);
+            vendorService.setServiceCategory(serviceCategory);
             vendorService.setPrice(request.getPrice());
             vendorService.setDuration(request.getDuration());
 
@@ -425,11 +463,13 @@ public class VendorServiceService {
 
             ServiceAssignmentResponse response = new ServiceAssignmentResponse();
             response.setVendorId(vendor.getId());
-            response.setServiceCategoryName(service.getServiceName());
+            response.setServiceCategoryName(serviceCategory.getServiceName());
             response.setPrice(request.getPrice());
             response.setDuration(request.getDuration());
+
             responses.add(response);
         }
+
         return responses;
     }
     public VendorProfileResponse getMyProfile() {
