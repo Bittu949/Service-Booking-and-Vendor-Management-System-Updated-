@@ -274,4 +274,17 @@ public class VendorServiceController {
                 HttpStatus.OK
         );
     }
+    @GetMapping("/me/dashboard")
+    public ResponseEntity<ApiResponse<VendorSummaryResponse>> getMyDashboard() {
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Data found.",
+                        vendorServiceService.getMyDashboard(),
+                        LocalDateTime.now()
+                ),
+                HttpStatus.OK
+        );
+    }
 }

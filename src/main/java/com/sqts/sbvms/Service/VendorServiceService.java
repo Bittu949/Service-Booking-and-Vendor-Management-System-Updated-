@@ -528,4 +528,29 @@ public class VendorServiceService {
 
         return response;
     }
+    public VendorSummaryResponse getMyDashboard() {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        CustomUserDetails userDetails =
+                (CustomUserDetails) authentication.getPrincipal();
+
+        Vendor vendor = vendorRepository.findByUserId(userDetails.getId())
+                .orElseThrow(() ->
+                        new VendorNotFoundException("Vendor not found."));
+
+        Long count = vendorServiceRepository.countByVendor_id(vendor.getId());
+
+        VendorSummaryResponse response = new VendorSummaryResponse();
+
+        response.setVendorId(vendor.getId());
+        response.setVendorName(vendor.getUser().getName());
+        response.setVendorEmail(vendor.getUser().getEmail());
+        response.setTotalAssignedServices(count);
+        response.setStatus(vendor.getStatus());
+        response.setVendorAddress(vendor.getVendorAddress());
+
+        return response;
+    }
 }
