@@ -287,4 +287,17 @@ public class VendorServiceController {
                 HttpStatus.OK
         );
     }
+    @GetMapping("/me/services")
+    public ResponseEntity<ApiResponse<DisplayVendorDetails>> getMyServices(){
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Data found.",
+                        vendorServiceService.getMyServices(),
+                        LocalDateTime.now()
+                ),
+                HttpStatus.OK
+        );
+    }
 }

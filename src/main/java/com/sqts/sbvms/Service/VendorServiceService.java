@@ -553,4 +553,39 @@ public class VendorServiceService {
 
         return response;
     }
+    public DisplayVendorDetails getMyServices(){
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        CustomUserDetails userDetails =
+                (CustomUserDetails) authentication.getPrincipal();
+
+        Vendor vendor = vendorRepository.findByUserId(userDetails.getId())
+                .orElseThrow(() ->
+                        new VendorNotFoundException("Vendor not found."));
+
+        DisplayVendorDetails response = new DisplayVendorDetails();
+
+        response.setVendorName(vendor.getUser().getName());
+        response.setVendorEmail(vendor.getUser().getEmail());
+        response.setVendorAddress(vendor.getVendorAddress());
+
+        List<VendorServiceDetails> serviceDetails = new ArrayList<>();
+
+        for (VendorService service : vendor.getVendorServices()) {
+
+            VendorServiceDetails details = new VendorServiceDetails();
+
+            details.setServiceCategory(service.getServiceCategory());
+            details.setPrice(service.getPrice());
+            details.setDuration(service.getDuration());
+
+            serviceDetails.add(details);
+        }
+
+        response.setVendorServiceDetails(serviceDetails);
+
+        return response;
+    }
 }
