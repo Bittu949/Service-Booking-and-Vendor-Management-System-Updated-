@@ -71,6 +71,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/vendors/*/approve").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/vendors/*/reject").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/me").hasAuthority("ROLE_VENDOR")
+                        .requestMatchers(HttpMethod.PUT, "/me").hasAuthority("ROLE_VENDOR")
+
                     .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter,

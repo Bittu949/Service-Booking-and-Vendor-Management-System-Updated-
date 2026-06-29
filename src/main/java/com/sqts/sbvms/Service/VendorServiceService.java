@@ -466,4 +466,66 @@ public class VendorServiceService {
 
         return response;
     }
+    public VendorUpdateResponse updateMyProfile(VendorUpdateRequest request){
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        CustomUserDetails userDetails =
+                (CustomUserDetails) authentication.getPrincipal();
+
+        Vendor vendor = vendorRepository.findByUserId(userDetails.getId())
+                .orElseThrow(() ->
+                        new VendorNotFoundException("Vendor not found."));
+
+        if(request.getVendorName() != null)
+            vendor.getUser().setName(request.getVendorName().trim());
+
+        if(request.getVendorEmail() != null){
+
+            String email = request.getVendorEmail().trim();
+
+            if(!email.equalsIgnoreCase(vendor.getUser().getEmail())
+                    && userRepository.existsByEmail(email))
+                throw new UserAlreadyExistsException("Email already registered.");
+
+            vendor.getUser().setEmail(email);
+        }
+
+        if(request.getPassword() != null){
+
+            if(request.getPassword().trim().length() < 8)
+                throw new WeakPasswordException("Provided password is weak.");
+
+            vendor.getUser().setPassword(
+                    passwordEncoder.encode(request.getPassword().trim()));
+        }
+
+        if(request.getVendorAddress() != null)
+            vendor.setVendorAddress(request.getVendorAddress());
+
+        if(request.getPhoneNumber() != null){
+
+            String phone = request.getPhoneNumber().trim();
+
+            if(!phone.equals(vendor.getPhoneNumber())
+                    && vendorRepository.existsByPhoneNumber(phone))
+                throw new VendorAlreadyExistsException(
+                        "Phone number already registered.");
+
+            vendor.setPhoneNumber(phone);
+        }
+
+        vendorRepository.save(vendor);
+
+        VendorUpdateResponse response = new VendorUpdateResponse();
+
+        response.setVendorId(vendor.getId());
+        response.setVendorName(vendor.getUser().getName());
+        response.setVendorEmail(vendor.getUser().getEmail());
+        response.setVendorAddress(vendor.getVendorAddress());
+        response.setPhoneNumber(vendor.getPhoneNumber());
+
+        return response;
+    }
 }

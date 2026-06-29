@@ -260,4 +260,18 @@ public class VendorServiceController {
                 HttpStatus.OK
         );
     }
+    @PutMapping("/me")
+    public ResponseEntity<ApiResponse<VendorUpdateResponse>> updateMyProfile(
+            @Valid @RequestBody VendorUpdateRequest request) {
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Profile updated successfully.",
+                        vendorServiceService.updateMyProfile(request),
+                        LocalDateTime.now()
+                ),
+                HttpStatus.OK
+        );
+    }
 }
