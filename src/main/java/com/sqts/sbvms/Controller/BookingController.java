@@ -41,6 +41,24 @@ public class BookingController {
                 HttpStatus.OK
         );
     }
+    @GetMapping("/me/vendor/bookings")
+    public ResponseEntity<ApiResponse<List<VendorBookingHistoryResponse>>> getMyVendorBookings() {
+
+        List<VendorBookingHistoryResponse> bookings =
+                bookingService.getMyVendorBookings();
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        bookings.isEmpty()
+                                ? "Bookings not found."
+                                : "Bookings found.",
+                        bookings,
+                        LocalDateTime.now()
+                ),
+                HttpStatus.OK
+        );
+    }
     @GetMapping("/bookings/pending")
     public ResponseEntity<ApiResponse<List<PendingBookingResponse>>> getPendingBookings(){
         List<PendingBookingResponse> pendingBookings = bookingService.getPendingBookings();

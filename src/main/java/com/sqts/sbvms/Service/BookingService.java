@@ -107,6 +107,20 @@ public class BookingService {
 
         return response;
     }
+    public List<VendorBookingHistoryResponse> getMyVendorBookings() {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        CustomUserDetails userDetails =
+                (CustomUserDetails) authentication.getPrincipal();
+
+        Vendor vendor = vendorRepository.findByUserId(userDetails.getId())
+                .orElseThrow(() ->
+                        new VendorNotFoundException("Vendor not found."));
+
+        return getVendorBookingHistory(vendor.getId());
+    }
     public List<PendingBookingResponse> getPendingBookings(){
         List<PendingBookingResponse> pendingBookings = new ArrayList<>();
         List<Booking> bookings = bookingRepository.findByStatus(BookingStatus.PENDING);
