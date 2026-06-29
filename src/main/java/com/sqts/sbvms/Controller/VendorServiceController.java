@@ -172,7 +172,7 @@ public class VendorServiceController {
     @PutMapping("/vendor/{vendorId}/services/{serviceId}")
     public ResponseEntity<ApiResponse<ServiceUpdationResponse>> updateAssignedServiceDetails(@PathVariable(name = "vendorId") long vendorId,
                                                                                    @PathVariable(name = "serviceId") long serviceId,
-                                                                                   @RequestBody ServiceUpdationRequest request){
+                                                                                             @Valid @RequestBody ServiceUpdationRequest request){
         return new ResponseEntity<>(
                 new ApiResponse<>(
                         true,
@@ -226,14 +226,14 @@ public class VendorServiceController {
     }
     @PostMapping("/vendor/{id}/services/bulk")
     public ResponseEntity<ApiResponse<List<ServiceAssignmentResponse>>> bulkServiceAssignment(@PathVariable("id") Long vendorId,
-                                                                      @RequestBody List<BulkServiceAssignmentRequest> request){
+                                                                                              @Valid @RequestBody List<BulkServiceAssignmentRequest> request){
         return new ResponseEntity<>(
                 new ApiResponse<>(
                         true,
                         "services assigned successfully.",
                         vendorServiceService.bulkServiceAssignment(vendorId, request),
                         LocalDateTime.now()),
-                HttpStatus.OK);
+                HttpStatus.CREATED);
     }
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<VendorProfileResponse>> getMyProfile() {
