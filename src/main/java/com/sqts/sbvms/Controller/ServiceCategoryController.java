@@ -52,7 +52,7 @@ public class ServiceCategoryController {
                 HttpStatus.OK);
     }
     @DeleteMapping("/services/{id}")
-    public ResponseEntity<ApiResponse<ServiceCategory>> deleteService(@PathVariable(name = "id") Long serviceId){
+    public ResponseEntity<ApiResponse<ServiceCategoryResponse>> deleteService(@PathVariable(name = "id") Long serviceId){
         return new ResponseEntity<>(
                 new ApiResponse<>(
                         true,

@@ -104,11 +104,24 @@ public class ServiceCategoryService {
 
         return response;
     }
-    public ServiceCategory deleteService(Long serviceId){
-        ServiceCategory serviceCategory = serviceCategoryRepository.findById(serviceId)
-                .orElseThrow(() -> new NoServiceFoundException("Service not found."));
-        serviceCategoryRepository.delete(serviceCategory);
-        return serviceCategory;
+    public ServiceCategoryResponse deleteService(Long serviceId){
+
+        ServiceCategory service = serviceCategoryRepository.findById(serviceId)
+                .orElseThrow(() ->
+                        new NoServiceFoundException("Service not found."));
+
+        if(vendorServiceRepository.existsByServiceCategoryId(serviceId))
+            throw new InvalidOperationException(
+                    "Cannot delete a service that is assigned to vendors.");
+
+        serviceCategoryRepository.delete(service);
+
+        ServiceCategoryResponse response = new ServiceCategoryResponse();
+        response.setId(service.getId());
+        response.setServiceName(service.getServiceName());
+        response.setDescription(service.getDescription());
+
+        return response;
     }
     public ServiceCategory getSingleServices(Long serviceId){
         return serviceCategoryRepository.findById(serviceId)
