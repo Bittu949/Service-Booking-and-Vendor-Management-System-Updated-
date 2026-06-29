@@ -62,7 +62,7 @@ public class ServiceCategoryController {
                 HttpStatus.OK);
     }
     @GetMapping("/services/{id}")
-    public ResponseEntity<ApiResponse<ServiceCategory>> getSingleServices(@PathVariable(name = "id") Long serviceId){
+    public ResponseEntity<ApiResponse<ServiceCategoryResponse>> getSingleServices(@PathVariable(name = "id") Long serviceId){
         return new ResponseEntity<>(
                 new ApiResponse<>(
                         true,

@@ -123,9 +123,19 @@ public class ServiceCategoryService {
 
         return response;
     }
-    public ServiceCategory getSingleServices(Long serviceId){
-        return serviceCategoryRepository.findById(serviceId)
-                .orElseThrow(() -> new NoServiceFoundException("Service not found."));
+    public ServiceCategoryResponse getSingleServices(Long serviceId){
+
+        ServiceCategory service = serviceCategoryRepository.findById(serviceId)
+                .orElseThrow(() ->
+                        new NoServiceFoundException("Service not found."));
+
+        ServiceCategoryResponse response = new ServiceCategoryResponse();
+
+        response.setId(service.getId());
+        response.setServiceName(service.getServiceName());
+        response.setDescription(service.getDescription());
+
+        return response;
     }
     public List<VendorByServiceResponse> getVendorsByService(Long serviceId, Long minPrice, Long maxPrice, String sortBy){
         ServiceCategory service = serviceCategoryRepository.findById(serviceId)
@@ -161,6 +171,9 @@ public class ServiceCategoryService {
                 vendorByServiceResponses.add(response);
             }
         }
+        if(vendorByServiceResponses.isEmpty())
+            throw new ServiceAssignmentNotFoundException(
+                    "No active vendor provides this service.");
         return vendorByServiceResponses;
     }
     public Long countTotalServices(){
