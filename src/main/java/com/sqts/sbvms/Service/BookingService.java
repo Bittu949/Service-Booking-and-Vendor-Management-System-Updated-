@@ -71,6 +71,42 @@ public class BookingService {
         response.setBookingAddress(booking.getBookingAddress());
         return response;
     }
+    public BookingDetailsResponse getMyBookingById(Long bookingId){
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        CustomUserDetails userDetails =
+                (CustomUserDetails) authentication.getPrincipal();
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() ->
+                        new BookingNotFoundException("Booking not found."));
+
+        if(!booking.getUser().getId().equals(userDetails.getId()))
+            throw new UnauthorizedAccessException(
+                    "You are not authorized to view this booking.");
+
+        BookingDetailsResponse response = new BookingDetailsResponse();
+
+        response.setBookingId(booking.getId());
+        response.setBookingDate(booking.getBookingDate());
+        response.setBookingStatus(booking.getStatus());
+        response.setStartTime(booking.getTimeSlot().getStartTime());
+        response.setEndTime(booking.getTimeSlot().getEndTime());
+        response.setServiceName(booking.getServiceCategory().getServiceName());
+        response.setCustomerName(booking.getUser().getName());
+        response.setBookingAddress(booking.getBookingAddress());
+
+        if(booking.getVendorService() != null){
+
+            response.setVendorId(booking.getVendorService().getVendor().getId());
+            response.setVendorName(booking.getVendorService().getVendor().getUser().getName());
+            response.setVendorAddress(booking.getVendorService().getVendor().getVendorAddress());
+        }
+
+        return response;
+    }
     public List<PendingBookingResponse> getPendingBookings(){
         List<PendingBookingResponse> pendingBookings = new ArrayList<>();
         List<Booking> bookings = bookingRepository.findByStatus(BookingStatus.PENDING);

@@ -76,6 +76,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/me/services").hasAuthority("ROLE_VENDOR")
                         .requestMatchers(HttpMethod.GET, "/me/services/*").hasAuthority("ROLE_VENDOR")
                         .requestMatchers(HttpMethod.POST, "/bookings").hasAuthority("ROLE_CUSTOMER")
+                        .requestMatchers(HttpMethod.GET, "/me/bookings/*").hasAuthority("ROLE_CUSTOMER")
 
                     .anyRequest().authenticated()
                 )

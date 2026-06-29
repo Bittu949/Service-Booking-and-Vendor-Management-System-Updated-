@@ -27,6 +27,20 @@ public class BookingController {
                         LocalDateTime.now()),
                 HttpStatus.CREATED);
     }
+    @GetMapping("/me/bookings/{bookingId}")
+    public ResponseEntity<ApiResponse<BookingDetailsResponse>> getMyBookingById(
+            @PathVariable Long bookingId){
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Booking found.",
+                        bookingService.getMyBookingById(bookingId),
+                        LocalDateTime.now()
+                ),
+                HttpStatus.OK
+        );
+    }
     @GetMapping("/bookings/pending")
     public ResponseEntity<ApiResponse<List<PendingBookingResponse>>> getPendingBookings(){
         List<PendingBookingResponse> pendingBookings = bookingService.getPendingBookings();
