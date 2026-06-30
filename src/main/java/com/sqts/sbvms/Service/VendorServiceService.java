@@ -75,6 +75,13 @@ public class VendorServiceService {
         if(request == null)
             throw new InvalidInputException("Please fill all the fields.");
 
+        Duration duration = request.getDuration();
+
+        if (duration.isNegative() || duration.isZero()) {
+            throw new InvalidDurationException(
+                    "Duration must be greater than zero.");
+        }
+
         Vendor vendor = vendorRepository.findById(request.getVendorId())
                 .orElseThrow(() ->
                         new VendorNotFoundException("Vendor not found."));

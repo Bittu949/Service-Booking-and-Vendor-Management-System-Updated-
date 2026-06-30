@@ -3,6 +3,7 @@ package com.sqts.sbvms.Exception;
 import com.sqts.sbvms.Dto.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -283,5 +284,33 @@ public class GlobalExceptionHandler {
                         null,
                         LocalDateTime.now()),
                 HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Object>> handleHttpMessageNotReadable(
+            HttpMessageNotReadableException ex) {
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        false,
+                        "Invalid request format. Please provide a valid ISO-8601 duration (e.g. PT2H).",
+                        null,
+                        LocalDateTime.now()
+                ),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+    @ExceptionHandler(InvalidDurationException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInvalidDurationException(
+            InvalidDurationException ex) {
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        false,
+                        "Invalid request format. Please provide a valid ISO-8601 duration (e.g. PT2H).",
+                        null,
+                        LocalDateTime.now()
+                ),
+                HttpStatus.BAD_REQUEST
+        );
     }
 }
