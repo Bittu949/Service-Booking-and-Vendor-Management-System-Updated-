@@ -1,8 +1,6 @@
 package com.sqts.sbvms.Controller;
 
-import com.sqts.sbvms.Dto.ApiResponse;
-import com.sqts.sbvms.Dto.LoginRequest;
-import com.sqts.sbvms.Dto.RegisterRequest;
+import com.sqts.sbvms.Dto.*;
 import com.sqts.sbvms.Service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -64,5 +62,27 @@ public class AuthController {
                         authService.login(request),
                         LocalDateTime.now()),
                 HttpStatus.OK);
+    }
+    @Operation(
+            summary = "Register as Vendor",
+            description = "Allows a new vendor to submit a registration request. The registration remains in pending approval status until reviewed by an administrator."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Vendor registration submitted successfully."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid input or duplicate email/phone number."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "Vendor already exists.")
+    })
+    @PostMapping("/vendor/register")
+    public ResponseEntity<ApiResponse<VendorRegistrationResponse>> registerVendor(
+            @Valid @RequestBody VendorRegistrationRequest request){
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Registration request submitted successfully. Please wait for admin approval.",
+                        authService.registerVendor(request),
+                        LocalDateTime.now()
+                ),
+                HttpStatus.CREATED
+        );
     }
 }

@@ -5,6 +5,7 @@ import com.sqts.sbvms.Service.ServiceCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import java.util.List;
         description = "APIs for managing service categories and browsing available services."
 )
 @RestController
+@SecurityRequirement(name = "Bearer Authentication")
 public class ServiceCategoryController {
     private final ServiceCategoryService serviceCategoryService;
     public ServiceCategoryController(ServiceCategoryService serviceCategoryService){

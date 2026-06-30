@@ -6,6 +6,7 @@ import com.sqts.sbvms.Service.BookingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import java.util.List;
         description = "APIs for creating, assigning and managing service bookings."
 )
 @RestController
+@SecurityRequirement(name = "Bearer Authentication")
 public class BookingController {
     private final BookingService bookingService;
     public BookingController(BookingService bookingService) {

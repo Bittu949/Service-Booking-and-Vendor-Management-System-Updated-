@@ -2,6 +2,8 @@ package com.sqts.sbvms.Service;
 
 import com.sqts.sbvms.Dto.LoginRequest;
 import com.sqts.sbvms.Dto.RegisterRequest;
+import com.sqts.sbvms.Dto.VendorRegistrationRequest;
+import com.sqts.sbvms.Dto.VendorRegistrationResponse;
 import com.sqts.sbvms.Entity.User;
 import com.sqts.sbvms.Entity.Vendor;
 import com.sqts.sbvms.Enum.Role;
@@ -80,5 +82,48 @@ public class AuthService {
         }
 
         return jwtService.generateToken(userDetails);
+    }
+    public VendorRegistrationResponse registerVendor(VendorRegistrationRequest request) {
+        if (request == null)
+            throw new InvalidInputException("Please fill all the details.");
+
+        if (request.getPassword().trim().length() < 8)
+            throw new WeakPasswordException("Provided password is weak.");
+
+        if (userRepository.existsByEmail(request.getEmail().trim()))
+            throw new UserAlreadyExistsException("Email already registered.");
+
+        if (vendorRepository.existsByPhoneNumber(request.getPhoneNumber().trim()))
+            throw new VendorAlreadyExistsException(
+                    "Phone number already registered.");
+
+        User user = new User();
+        user.setName(request.getName().trim());
+        user.setEmail(request.getEmail().trim());
+        user.setPassword(passwordEncoder.encode(request.getPassword().trim()));
+        user.setRole(Role.VENDOR);
+
+        userRepository.save(user);
+
+        Vendor vendor = new Vendor();
+        vendor.setUser(user);
+        vendor.setStatus(VendorStatus.PENDING_APPROVAL);
+        vendor.setVendorAddress(request.getVendorAddress());
+        vendor.setExperienceYears(request.getExperienceYears());
+        vendor.setDescription(request.getDescription());
+        vendor.setPhoneNumber(request.getPhoneNumber().trim());
+        vendor.setAadhaarNumber(request.getAadhaarNumber());
+        vendor.setAadhaarFrontImage(request.getAadhaarFrontImage());
+        vendor.setAadhaarBackImage(request.getAadhaarBackImage());
+        vendor.setVerificationDocument(request.getVerificationDocument());
+
+        vendorRepository.save(vendor);
+
+        VendorRegistrationResponse response = new VendorRegistrationResponse();
+        response.setVendorId(vendor.getId());
+        response.setVendorName(user.getName());
+        response.setStatus(vendor.getStatus());
+
+        return response;
     }
 }

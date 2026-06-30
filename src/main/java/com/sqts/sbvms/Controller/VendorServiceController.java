@@ -8,6 +8,7 @@ import com.sqts.sbvms.Service.VendorServiceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -21,32 +22,11 @@ import java.util.List;
         description = "APIs for vendor profile management, approval, service assignment and administration."
 )
 @RestController
+@SecurityRequirement(name = "Bearer Authentication")
 public class VendorServiceController {
     VendorServiceService vendorServiceService;
     public VendorServiceController(VendorServiceService vendorServiceService) {
         this.vendorServiceService = vendorServiceService;
-    }
-    @Operation(
-            summary = "Register as Vendor",
-            description = "Allows a new vendor to submit a registration request. The registration remains in pending approval status until reviewed by an administrator."
-    )
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Vendor registration submitted successfully."),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid input or duplicate email/phone number."),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "Vendor already exists.")
-    })
-    @PostMapping("/vendor/register")
-    public ResponseEntity<ApiResponse<VendorRegistrationResponse>> registerVendor(
-            @Valid @RequestBody VendorRegistrationRequest request){
-        return new ResponseEntity<>(
-                new ApiResponse<>(
-                        true,
-                        "Registration request submitted successfully. Please wait for admin approval.",
-                        vendorServiceService.registerVendor(request),
-                        LocalDateTime.now()
-                ),
-                HttpStatus.CREATED
-        );
     }
     @Operation(
             summary = "Get Pending Vendor Requests",
