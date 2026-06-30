@@ -3,6 +3,7 @@ package com.sqts.sbvms.Controller;
 import com.sqts.sbvms.Dto.*;
 import com.sqts.sbvms.Enum.BookingStatus;
 import com.sqts.sbvms.Service.BookingService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
+@Tag(
+        name = "Booking Management",
+        description = "APIs for creating, assigning and managing service bookings."
+)
 @RestController
 public class BookingController {
     private final BookingService bookingService;

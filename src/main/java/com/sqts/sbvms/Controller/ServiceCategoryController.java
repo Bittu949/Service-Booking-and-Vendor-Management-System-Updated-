@@ -2,6 +2,7 @@ package com.sqts.sbvms.Controller;
 
 import com.sqts.sbvms.Dto.*;
 import com.sqts.sbvms.Service.ServiceCategoryService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +10,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+@Tag(
+        name = "Service Management",
+        description = "APIs for managing service categories and browsing available services."
+)
 @RestController
 public class ServiceCategoryController {
     private final ServiceCategoryService serviceCategoryService;

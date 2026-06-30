@@ -5,6 +5,7 @@ import com.sqts.sbvms.Entity.User;
 import com.sqts.sbvms.Entity.Vendor;
 import com.sqts.sbvms.Entity.VendorService;
 import com.sqts.sbvms.Service.VendorServiceService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+@Tag(
+        name = "Vendor Management",
+        description = "APIs for vendor profile management, approval, service assignment and administration."
+)
 @RestController
 public class VendorServiceController {
     VendorServiceService vendorServiceService;

@@ -4,6 +4,7 @@ import com.sqts.sbvms.Dto.ApiResponse;
 import com.sqts.sbvms.Dto.LoginRequest;
 import com.sqts.sbvms.Dto.RegisterRequest;
 import com.sqts.sbvms.Service.AuthService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
-
+@Tag(
+        name = "Authentication",
+        description = "APIs for user registration, vendor registration and login."
+)
 @RestController
 public class AuthController {
     private final AuthService authService;
