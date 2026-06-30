@@ -3,6 +3,9 @@ package com.sqts.sbvms.Controller;
 import com.sqts.sbvms.Dto.*;
 import com.sqts.sbvms.Enum.BookingStatus;
 import com.sqts.sbvms.Service.BookingService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +24,15 @@ public class BookingController {
     public BookingController(BookingService bookingService) {
         this.bookingService = bookingService;
     }
+    @Operation(
+            summary = "Create Booking",
+            description = "Creates a new booking request for the authenticated customer using the selected service, date, time slot and booking address."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Booking created successfully."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid booking details."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Requested service not found.")
+    })
     @PostMapping("/bookings")
     public ResponseEntity<ApiResponse<BookingResponse>> createBooking(@RequestBody BookingRequest request){
         return new ResponseEntity<>(
@@ -31,8 +43,22 @@ public class BookingController {
                         LocalDateTime.now()),
                 HttpStatus.CREATED);
     }
+    @Operation(
+            summary = "Get Customer Booking",
+            description = "Retrieves detailed information about a specific booking belonging to the authenticated customer."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Booking retrieved successfully."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "You are not authorized to view this booking."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Booking not found.")
+    })
     @GetMapping("/me/bookings/{bookingId}")
     public ResponseEntity<ApiResponse<BookingDetailsResponse>> getMyBookingById(
+            @Parameter(
+                    description = "Booking ID",
+                    example = "101",
+                    required = true
+            )
             @PathVariable Long bookingId){
 
         return new ResponseEntity<>(
@@ -45,6 +71,14 @@ public class BookingController {
                 HttpStatus.OK
         );
     }
+    @Operation(
+            summary = "Get Vendor Bookings",
+            description = "Retrieves all bookings assigned to the authenticated vendor."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Vendor bookings retrieved successfully."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Vendor not found.")
+    })
     @GetMapping("/me/vendor/bookings")
     public ResponseEntity<ApiResponse<List<VendorBookingHistoryResponse>>> getMyVendorBookings() {
 
@@ -63,8 +97,23 @@ public class BookingController {
                 HttpStatus.OK
         );
     }
+    @Operation(
+            summary = "Update Vendor Booking Status",
+            description = "Allows the authenticated vendor to mark an assigned booking as COMPLETED or CANCELLED."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Booking status updated successfully."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid booking state or status."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Not authorized to update this booking."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Booking not found.")
+    })
     @PatchMapping("/me/bookings/{bookingId}/status")
     public ResponseEntity<ApiResponse<UpdateBookingStatusResponse>> updateMyBookingStatus(
+            @Parameter(
+                    description = "Booking ID",
+                    example = "101",
+                    required = true
+            )
             @PathVariable Long bookingId,
             @RequestBody UpdateBookingStatusRequest request){
 
@@ -78,6 +127,13 @@ public class BookingController {
                 HttpStatus.OK
         );
     }
+    @Operation(
+            summary = "Get Pending Bookings",
+            description = "Retrieves all booking requests that are awaiting vendor assignment."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Pending bookings retrieved successfully.")
+    })
     @GetMapping("/bookings/pending")
     public ResponseEntity<ApiResponse<List<PendingBookingResponse>>> getPendingBookings(){
         List<PendingBookingResponse> pendingBookings = bookingService.getPendingBookings();
@@ -89,13 +145,32 @@ public class BookingController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
+    @Operation(
+            summary = "Get Available Vendors",
+            description = "Retrieves all active vendors available for a booking, with optional nearby filtering based on the customer's pincode."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Available vendors retrieved successfully."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Booking is not pending."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Booking not found.")
+    })
     @GetMapping("/bookings/{bookingId}/available-vendors")
-    public ResponseEntity<ApiResponse<List<AvailableVendorResponse>>> getAvailableVendorsForBooking(@PathVariable(name = "bookingId")
-                                                                                                        Long bookingId,
-                                                                                                    @RequestParam(name = "nearby",
-                                                                                                            required = false,
-                                                                                                            defaultValue = "false")
-                                                                                                    boolean nearby){
+    public ResponseEntity<ApiResponse<List<AvailableVendorResponse>>> getAvailableVendorsForBooking(
+            @Parameter(
+                    description = "Booking ID",
+                    example = "101",
+                    required = true
+            )
+            @PathVariable(name = "bookingId")
+            Long bookingId,
+            @Parameter(
+                    description = "Return only vendors whose pincode matches the booking address.",
+                    example = "true"
+            )
+            @RequestParam(name = "nearby",
+                    required = false,
+                    defaultValue = "false")
+            boolean nearby){
         List<AvailableVendorResponse> availableVendors = bookingService.getAvailableVendorsForBooking(bookingId, nearby);
         return new ResponseEntity<>(
                 new ApiResponse<>(
@@ -105,6 +180,15 @@ public class BookingController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
+    @Operation(
+            summary = "Assign Vendor To Booking",
+            description = "Assigns an available vendor to a pending booking and confirms the booking."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Vendor assigned successfully."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Vendor unavailable or booking already assigned."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Booking or vendor service not found.")
+    })
     @PatchMapping("/bookings/{id}/assign-vendor")
     public ResponseEntity<ApiResponse<AssignVendorResponse>> assignVendorToBooking(@RequestBody AssignVendorRequest request,
                                                                                    @PathVariable(name = "id") Long bookingId){
@@ -116,8 +200,22 @@ public class BookingController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
+    @Operation(
+            summary = "Get Booking Details",
+            description = "Retrieves complete details of a booking by its identifier."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Booking retrieved successfully."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Booking not found.")
+    })
     @GetMapping("/bookings/{id}")
-    public ResponseEntity<ApiResponse<BookingDetailsResponse>> getBookingById(@PathVariable(name = "id") Long bookingId){
+    public ResponseEntity<ApiResponse<BookingDetailsResponse>> getBookingById(
+            @Parameter(
+                    description = "Booking ID",
+                    example = "101",
+                    required = true
+            )
+            @PathVariable(name = "id") Long bookingId){
         return new ResponseEntity<>(
                 new ApiResponse<>(
                         true,
@@ -126,8 +224,22 @@ public class BookingController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
+    @Operation(
+            summary = "Get Customer Booking History",
+            description = "Retrieves the complete booking history of a specific customer."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Customer booking history retrieved successfully."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Customer not found.")
+    })
     @GetMapping("/users/{id}/bookings")
-    public ResponseEntity<ApiResponse<List<BookingHistoryResponse>>> getCustomerBookingHistory(@PathVariable(name = "id") Long customerId){
+    public ResponseEntity<ApiResponse<List<BookingHistoryResponse>>> getCustomerBookingHistory(
+            @Parameter(
+                    description = "Customer ID",
+                    example = "5",
+                    required = true
+            )
+            @PathVariable(name = "id") Long customerId){
         List<BookingHistoryResponse> bookingHistory = bookingService.getCustomerBookingHistory(customerId);
         return new ResponseEntity<>(
                 new ApiResponse<>(
@@ -137,9 +249,24 @@ public class BookingController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
+    @Operation(
+            summary = "Cancel Booking",
+            description = "Allows the administrator to cancel a pending booking before a vendor has completed the service."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Booking cancelled successfully."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Only pending bookings can be cancelled."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Booking not found.")
+    })
     @PatchMapping("/bookings/{id}/status")
-    public ResponseEntity<ApiResponse<UpdateBookingStatusResponse>> updateBookingStatus(@RequestBody UpdateBookingStatusRequest request,
-                                                                                        @PathVariable(name = "id") Long bookingId){
+    public ResponseEntity<ApiResponse<UpdateBookingStatusResponse>> updateBookingStatus(
+            @RequestBody UpdateBookingStatusRequest request,
+            @Parameter(
+                    description = "Booking ID",
+                    example = "101",
+                    required = true
+            )
+            @PathVariable(name = "id") Long bookingId){
         return new ResponseEntity<>(
                 new ApiResponse<>(
                         true,
@@ -148,8 +275,22 @@ public class BookingController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
+    @Operation(
+            summary = "Get Vendor Booking History",
+            description = "Retrieves the complete booking history of a specific vendor."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Vendor booking history retrieved successfully."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Vendor not found.")
+    })
     @GetMapping("/vendors/{id}/bookings")
-    public ResponseEntity<ApiResponse<List<VendorBookingHistoryResponse>>> getVendorBookingHistory(@PathVariable(name = "id") Long vendorId){
+    public ResponseEntity<ApiResponse<List<VendorBookingHistoryResponse>>> getVendorBookingHistory(
+            @Parameter(
+                    description = "Vendor ID",
+                    example = "10",
+                    required = true
+            )
+            @PathVariable(name = "id") Long vendorId){
         List<VendorBookingHistoryResponse> vendorBookings = bookingService.getVendorBookingHistory(vendorId);
         return new ResponseEntity<>(
                 new ApiResponse<>(
@@ -159,9 +300,25 @@ public class BookingController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
+    @Operation(
+            summary = "Filter Bookings",
+            description = "Retrieves bookings filtered by booking status and/or booking date."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Bookings retrieved successfully.")
+    })
     @GetMapping("/bookings")
-    public ResponseEntity<ApiResponse<List<BookingHistoryResponse>>> getFilteredBookings(@RequestParam(name = "status", required = false) BookingStatus bookingStatus,
-                                                                                    @RequestParam(name = "date", required = false) LocalDate bookingDate){
+    public ResponseEntity<ApiResponse<List<BookingHistoryResponse>>> getFilteredBookings(
+            @Parameter(
+                    description = "Booking status",
+                    example = "CONFIRMED"
+            )
+            @RequestParam(name = "status", required = false) BookingStatus bookingStatus,
+            @Parameter(
+                    description = "Booking date",
+                    example = "2026-06-30"
+            )
+            @RequestParam(name = "date", required = false) LocalDate bookingDate){
         List<BookingHistoryResponse> bookings = bookingService.getFilteredBookings(bookingStatus, bookingDate);
         return new ResponseEntity<>(
                 new ApiResponse<>(
@@ -171,6 +328,13 @@ public class BookingController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
+    @Operation(
+            summary = "Get Total Bookings",
+            description = "Returns the total number of bookings in the system."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Booking count retrieved successfully.")
+    })
     @GetMapping("/bookings/count")
     public ResponseEntity<ApiResponse<Long>> getBookingsCount(){
         return new ResponseEntity<>(
@@ -181,6 +345,13 @@ public class BookingController {
                         LocalDateTime.now()),
                 HttpStatus.OK);
     }
+    @Operation(
+            summary = "Get My Booking History",
+            description = "Retrieves the complete booking history of the authenticated customer."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Customer booking history retrieved successfully.")
+    })
     @GetMapping("/me/bookings")
     public ResponseEntity<ApiResponse<List<BookingHistoryResponse>>> getMyBookings() {
 
@@ -194,6 +365,35 @@ public class BookingController {
                                 ? "Bookings not found."
                                 : "Bookings found.",
                         bookingHistory,
+                        LocalDateTime.now()
+                ),
+                HttpStatus.OK
+        );
+    }
+    @Operation(
+            summary = "Cancel My Booking",
+            description = "Allows the authenticated customer to cancel one of their pending bookings."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Booking cancelled successfully."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Only pending bookings can be cancelled."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "You are not authorized to cancel this booking."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Booking not found.")
+    })
+    @PatchMapping("/me/bookings/{bookingId}/cancel")
+    public ResponseEntity<ApiResponse<UpdateBookingStatusResponse>> cancelMyBooking(
+            @Parameter(
+                    description = "Booking ID",
+                    example = "101",
+                    required = true
+            )
+            @PathVariable Long bookingId){
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        true,
+                        "Booking cancelled successfully.",
+                        bookingService.cancelMyBooking(bookingId),
                         LocalDateTime.now()
                 ),
                 HttpStatus.OK

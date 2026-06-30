@@ -464,4 +464,39 @@ public class BookingService {
 
         return getCustomerBookingHistory(customerId);
     }
+    public UpdateBookingStatusResponse cancelMyBooking(Long bookingId) {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        CustomUserDetails userDetails =
+                (CustomUserDetails) authentication.getPrincipal();
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() ->
+                        new BookingNotFoundException("Booking not found."));
+
+        if (!booking.getUser().getId().equals(userDetails.getId()))
+            throw new UnauthorizedException(
+                    "You can only cancel your own bookings.");
+
+        if (booking.getStatus() != BookingStatus.PENDING)
+            throw new InvalidOperationException(
+                    "Only pending bookings can be cancelled.");
+
+        BookingStatus previousStatus = booking.getStatus();
+
+        booking.setStatus(BookingStatus.CANCELLED);
+
+        bookingRepository.save(booking);
+
+        UpdateBookingStatusResponse response =
+                new UpdateBookingStatusResponse();
+
+        response.setBookingId(booking.getId());
+        response.setPreviousStatus(previousStatus);
+        response.setCurrentStatus(booking.getStatus());
+
+        return response;
+    }
 }

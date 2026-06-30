@@ -65,6 +65,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/bookings").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/bookings/count").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/me/bookings").hasAuthority("ROLE_CUSTOMER")
+                        .requestMatchers(HttpMethod.PATCH, "/me/bookings/*/cancel").hasAuthority("ROLE_CUSTOMER")
                         .requestMatchers(HttpMethod.GET, "/vendors/pending").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/vendors/*/verification").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/vendors/*/approve").hasAuthority("ROLE_ADMIN")
