@@ -353,13 +353,25 @@ public class VendorServiceService {
         response.setPhoneNumber(vendor.getPhoneNumber());
         return response;
     }
-    public VendorDeletionResponse deleteVendor(Long vendorId){
-        Vendor vendor = vendorRepository.findById(vendorId).orElseThrow(() -> new VendorNotFoundException("Vendor not found."));
+    public VendorDeletionResponse deleteVendor(Long vendorId) {
+
+        Vendor vendor = vendorRepository.findById(vendorId)
+                .orElseThrow(() ->
+                        new VendorNotFoundException("Vendor not found."));
+
+        if (vendor.getStatus() != VendorStatus.ACTIVE)
+            throw new InvalidVendorStatusException(
+                    "Only active vendors can be deleted.");
+
         VendorDeletionResponse response = new VendorDeletionResponse();
+
         response.setVendorName(vendor.getUser().getName());
         response.setVendorEmail(vendor.getUser().getEmail());
+
         vendor.setStatus(VendorStatus.INACTIVE);
+
         vendorRepository.save(vendor);
+
         return response;
     }
     public void removeAssignedServiceFromVendor(Long vendorId, Long serviceId) {
