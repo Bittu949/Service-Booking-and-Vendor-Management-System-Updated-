@@ -98,74 +98,150 @@ public class VendorServiceService {
 
         return responses;
     }
-    public List<DisplayVendorDetails> displayAllVendors(){
+    public List<DisplayVendorDetails> displayAllVendors() {
+
         List<DisplayVendorDetails> vendorDetailsList = new ArrayList<>();
+
         List<Vendor> vendorList =
                 vendorRepository.findByStatus(VendorStatus.ACTIVE);
+
         if (vendorList.isEmpty())
             throw new NoVendorFoundException("No vendor found.");
-        for(Vendor vendor : vendorList) {
-            List<VendorService> providedServicesByVendor = vendor.getVendorServices();
-            List<VendorServiceDetails> serviceDetails = new ArrayList<>();
-            for (VendorService vendorService : providedServicesByVendor){
-                VendorServiceDetails vendorServiceDetails = new VendorServiceDetails();
-                vendorServiceDetails.setDuration(vendorService.getDuration());
+
+        for (Vendor vendor : vendorList) {
+
+            List<VendorService> providedServicesByVendor =
+                    vendor.getVendorServices();
+
+            List<VendorServiceDetails> serviceDetails =
+                    new ArrayList<>();
+
+            for (VendorService vendorService : providedServicesByVendor) {
+
+                VendorServiceDetails vendorServiceDetails =
+                        new VendorServiceDetails();
+
+                Duration duration = vendorService.getDuration();
+
+                vendorServiceDetails.setDuration(
+                        String.format(
+                                "%02d:%02d",
+                                duration.toHours(),
+                                duration.toMinutesPart()
+                        )
+                );
+
                 vendorServiceDetails.setPrice(vendorService.getPrice());
-                vendorServiceDetails.setServiceCategory(vendorService.getServiceCategory());
+                vendorServiceDetails.setServiceCategory(
+                        vendorService.getServiceCategory());
+
                 serviceDetails.add(vendorServiceDetails);
             }
-            DisplayVendorDetails vendorDetails = new DisplayVendorDetails();
+
+            DisplayVendorDetails vendorDetails =
+                    new DisplayVendorDetails();
+
             vendorDetails.setVendorName(vendor.getUser().getName());
             vendorDetails.setVendorEmail(vendor.getUser().getEmail());
             vendorDetails.setVendorStatus(vendor.getStatus());
             vendorDetails.setVendorServiceDetails(serviceDetails);
             vendorDetails.setVendorAddress(vendor.getVendorAddress());
+
             vendorDetailsList.add(vendorDetails);
         }
+
         return vendorDetailsList;
     }
-    public DisplayVendorDetails viewAssignedServices(Long id){
-        Vendor vendor = vendorRepository.findById(id).orElseThrow(() -> new VendorNotFoundException("Vendor not found."));
-        DisplayVendorDetails displayVendorDetails = new DisplayVendorDetails();
-        List<VendorServiceDetails> vendorServiceDetailsList = new ArrayList<>();
+    public DisplayVendorDetails viewAssignedServices(Long id) {
+
+        Vendor vendor = vendorRepository.findById(id)
+                .orElseThrow(() ->
+                        new VendorNotFoundException("Vendor not found."));
+
+        DisplayVendorDetails displayVendorDetails =
+                new DisplayVendorDetails();
+
+        List<VendorServiceDetails> vendorServiceDetailsList =
+                new ArrayList<>();
+
         displayVendorDetails.setVendorName(vendor.getUser().getName());
         displayVendorDetails.setVendorEmail(vendor.getUser().getEmail());
-        for(VendorService service : vendor.getVendorServices()){
-            VendorServiceDetails vendorServiceDetails = new VendorServiceDetails();
+
+        for (VendorService service : vendor.getVendorServices()) {
+
+            VendorServiceDetails vendorServiceDetails =
+                    new VendorServiceDetails();
+
+            Duration duration = service.getDuration();
+
             vendorServiceDetails.setPrice(service.getPrice());
-            vendorServiceDetails.setDuration(service.getDuration());
-            vendorServiceDetails.setServiceCategory(service.getServiceCategory());
+
+            vendorServiceDetails.setDuration(
+                    String.format(
+                            "%02d:%02d",
+                            duration.toHours(),
+                            duration.toMinutesPart()
+                    )
+            );
+
+            vendorServiceDetails.setServiceCategory(
+                    service.getServiceCategory());
+
             vendorServiceDetailsList.add(vendorServiceDetails);
         }
+
         displayVendorDetails.setVendorServiceDetails(vendorServiceDetailsList);
         displayVendorDetails.setVendorStatus(vendor.getStatus());
         displayVendorDetails.setVendorAddress(vendor.getVendorAddress());
+
         return displayVendorDetails;
     }
     public DisplayVendorDetails displayVendor(Long id) {
-        Vendor vendor = vendorRepository.findById(id).orElseThrow(() -> new NoVendorFoundException("Vendor not found"));
+
+        Vendor vendor = vendorRepository.findById(id)
+                .orElseThrow(() ->
+                        new NoVendorFoundException("Vendor not found."));
 
         User user = vendor.getUser();
-        String name = user.getName();
-        String email = user.getEmail();
-        DisplayVendorDetails displayVendorDetails = new DisplayVendorDetails();
-        List<VendorService> providedServices = vendorServiceRepository.findByVendorId(id);
-        List<VendorServiceDetails> serviceDetails = new ArrayList<>();
+
+        DisplayVendorDetails displayVendorDetails =
+                new DisplayVendorDetails();
+
+        List<VendorService> providedServices =
+                vendorServiceRepository.findByVendorId(id);
+
+        List<VendorServiceDetails> serviceDetails =
+                new ArrayList<>();
+
         for (VendorService service : providedServices) {
-            VendorServiceDetails vendorServiceDetails = new VendorServiceDetails();
-            long price = service.getPrice();
+
+            VendorServiceDetails vendorServiceDetails =
+                    new VendorServiceDetails();
+
             Duration duration = service.getDuration();
-            ServiceCategory serviceCategory = service.getServiceCategory();
-            vendorServiceDetails.setPrice(price);
-            vendorServiceDetails.setDuration(duration);
-            vendorServiceDetails.setServiceCategory(serviceCategory);
+
+            vendorServiceDetails.setPrice(service.getPrice());
+
+            vendorServiceDetails.setDuration(
+                    String.format(
+                            "%02d:%02d",
+                            duration.toHours(),
+                            duration.toMinutesPart()
+                    )
+            );
+
+            vendorServiceDetails.setServiceCategory(
+                    service.getServiceCategory());
+
             serviceDetails.add(vendorServiceDetails);
         }
-        displayVendorDetails.setVendorName(name);
-        displayVendorDetails.setVendorEmail(email);
+
+        displayVendorDetails.setVendorName(user.getName());
+        displayVendorDetails.setVendorEmail(user.getEmail());
         displayVendorDetails.setVendorServiceDetails(serviceDetails);
         displayVendorDetails.setVendorStatus(vendor.getStatus());
         displayVendorDetails.setVendorAddress(vendor.getVendorAddress());
+
         return displayVendorDetails;
     }
     public VendorVerificationResponse getVendorVerificationDetails(Long vendorId) {
@@ -594,7 +670,7 @@ public class VendorServiceService {
 
         return response;
     }
-    public DisplayVendorDetails getMyServices(){
+    public DisplayVendorDetails getMyServices() {
 
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
@@ -618,9 +694,18 @@ public class VendorServiceService {
 
             VendorServiceDetails details = new VendorServiceDetails();
 
+            Duration duration = service.getDuration();
+
             details.setServiceCategory(service.getServiceCategory());
             details.setPrice(service.getPrice());
-            details.setDuration(service.getDuration());
+
+            details.setDuration(
+                    String.format(
+                            "%02d:%02d",
+                            duration.toHours(),
+                            duration.toMinutesPart()
+                    )
+            );
 
             serviceDetails.add(details);
         }

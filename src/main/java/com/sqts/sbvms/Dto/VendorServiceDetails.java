@@ -26,10 +26,10 @@ public class VendorServiceDetails {
     private Long price;
 
     @Schema(
-            description = "Estimated duration required to complete the service.",
-            example = "PT2H"
+            description = "Estimated duration required to complete the service in HH:mm format.",
+            example = "02:00"
     )
-    private Duration duration;
+    private String duration;
 
     @Schema(
             description = "Service category assigned to the vendor."
