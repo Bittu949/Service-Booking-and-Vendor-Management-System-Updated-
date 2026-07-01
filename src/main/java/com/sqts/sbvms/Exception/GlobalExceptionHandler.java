@@ -290,10 +290,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleHttpMessageNotReadable(
             HttpMessageNotReadableException ex) {
 
+        ex.printStackTrace();
+
         return new ResponseEntity<>(
                 new ApiResponse<>(
                         false,
-                        "Invalid request format. Please provide a valid ISO-8601 duration (e.g. PT2H).",
+                        ex.getMessage(),
                         null,
                         LocalDateTime.now()
                 ),
@@ -307,7 +309,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(
                 new ApiResponse<>(
                         false,
-                        "Invalid request format. Please provide a valid ISO-8601 duration (e.g. PT2H).",
+                        ex.getMessage(),
                         null,
                         LocalDateTime.now()
                 ),
@@ -335,7 +337,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(
                 new ApiResponse<>(
                         false,
-                        "Invalid request format. Please provide a valid ISO-8601 duration (e.g. PT2H).",
+                        ex.getMessage(),
                         null,
                         LocalDateTime.now()
                 ),
