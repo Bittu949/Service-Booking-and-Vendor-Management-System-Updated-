@@ -712,6 +712,7 @@ public class VendorServiceService {
 
         response.setVendorName(vendor.getUser().getName());
         response.setVendorEmail(vendor.getUser().getEmail());
+        response.setVendorStatus(vendor.getStatus());
         response.setVendorAddress(vendor.getVendorAddress());
 
         List<VendorServiceDetails> serviceDetails = new ArrayList<>();
