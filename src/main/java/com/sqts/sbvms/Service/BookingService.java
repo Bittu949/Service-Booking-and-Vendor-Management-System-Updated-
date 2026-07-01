@@ -38,13 +38,6 @@ public class BookingService {
         this.vendorRepository = vendorRepository;
     }
     public BookingResponse createBooking(BookingRequest request){
-        if(request == null ||
-                request.getServiceId() == null ||
-                request.getBookingDate() == null ||
-                request.getTimeSlot() == null ||
-                request.getBookingAddress() == null)
-            throw new InvalidInputException("Please provide all the details.");
-        Booking booking = new Booking();
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
 
@@ -54,7 +47,24 @@ public class BookingService {
         User user = userRepository.findById(userDetails.getId())
                 .orElseThrow(() ->
                         new UserNotFoundException("User not found."));
-        ServiceCategory serviceCategory = serviceCategoryRepository.findById(request.getServiceId()).orElseThrow(() -> new ServiceNotFoundException("Service not found."));
+
+        ServiceCategory serviceCategory = serviceCategoryRepository.findById(
+                request.getServiceId())
+                .orElseThrow(
+                        () -> new ServiceNotFoundException("Service not found."));
+
+        if(bookingRepository.existsByUser_IdAndServiceCategory_IdAndBookingDateAndTimeSlotAndStatusIn(
+                user.getId(),
+                serviceCategory.getId(),
+                request.getBookingDate(),
+                request.getTimeSlot(),
+                List.of(BookingStatus.PENDING, BookingStatus.CONFIRMED)
+        ))
+            throw new DuplicateBookingException(
+                    "You already have an active booking for this service at the selected date and time."
+            );
+
+        Booking booking = new Booking();
         booking.setUser(user);
         booking.setBookingDate(request.getBookingDate());
         booking.setTimeSlot(request.getTimeSlot());

@@ -4,6 +4,7 @@ import com.sqts.sbvms.Dto.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -302,6 +303,34 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidDurationException.class)
     public ResponseEntity<ApiResponse<Object>> handleInvalidDurationException(
             InvalidDurationException ex) {
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        false,
+                        "Invalid request format. Please provide a valid ISO-8601 duration (e.g. PT2H).",
+                        null,
+                        LocalDateTime.now()
+                ),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiResponse<Object>> handleBadCredentials(
+            BadCredentialsException ex) {
+
+        return new ResponseEntity<>(
+                new ApiResponse<>(
+                        false,
+                        "Invalid email or password.",
+                        null,
+                        LocalDateTime.now()
+                ),
+                HttpStatus.UNAUTHORIZED
+        );
+    }
+    @ExceptionHandler(DuplicateBookingException.class)
+    public ResponseEntity<ApiResponse<Object>> handleDuplicateBookingException(
+            DuplicateBookingException ex) {
 
         return new ResponseEntity<>(
                 new ApiResponse<>(
