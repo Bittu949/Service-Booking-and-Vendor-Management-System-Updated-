@@ -344,7 +344,6 @@ public class BookingService {
 
             boolean hasOverlap = vendorBookings.stream()
 
-                    // Vendor is busy if booking is CONFIRMED or IN_PROGRESS
                     .filter(b ->
                             b.getStatus() == BookingStatus.CONFIRMED
                                     ||
@@ -367,15 +366,24 @@ public class BookingService {
                 AvailableVendorResponse response =
                         new AvailableVendorResponse();
 
+                response.setVendorServiceId(vendorService.getId());
+
                 response.setVendorId(vendor.getId());
-                response.setVendorName(vendor.getUser().getName());
-                response.setVendorEmail(vendor.getUser().getEmail());
-                response.setStatus(vendor.getStatus());
 
-                response.setPrice(vendorService.getPrice());
+                response.setVendorName(
+                        vendor.getUser().getName());
 
-                // Convert Duration -> HH:mm
-                Duration duration = vendorService.getDuration();
+                response.setVendorEmail(
+                        vendor.getUser().getEmail());
+
+                response.setStatus(
+                        vendor.getStatus());
+
+                response.setPrice(
+                        vendorService.getPrice());
+
+                Duration duration =
+                        vendorService.getDuration();
 
                 response.setEstimatedDuration(
                         String.format(

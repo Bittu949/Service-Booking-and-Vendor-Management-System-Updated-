@@ -20,6 +20,12 @@ import lombok.Setter;
 public class AvailableVendorResponse {
 
     @Schema(
+            description = "Unique identifier of the vendor service.",
+            example = "15"
+    )
+    private Long vendorServiceId;
+
+    @Schema(
             description = "Unique identifier of the vendor.",
             example = "12"
     )
