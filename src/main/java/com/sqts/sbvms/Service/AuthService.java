@@ -1,9 +1,6 @@
 package com.sqts.sbvms.Service;
 
-import com.sqts.sbvms.Dto.LoginRequest;
-import com.sqts.sbvms.Dto.RegisterRequest;
-import com.sqts.sbvms.Dto.VendorRegistrationRequest;
-import com.sqts.sbvms.Dto.VendorRegistrationResponse;
+import com.sqts.sbvms.Dto.*;
 import com.sqts.sbvms.Entity.ServiceCategory;
 import com.sqts.sbvms.Entity.User;
 import com.sqts.sbvms.Entity.Vendor;
@@ -11,6 +8,7 @@ import com.sqts.sbvms.Entity.VendorService;
 import com.sqts.sbvms.Enum.Role;
 import com.sqts.sbvms.Enum.VendorStatus;
 import com.sqts.sbvms.Exception.*;
+import com.sqts.sbvms.Model.Address;
 import com.sqts.sbvms.Repository.ServiceCategoryRepository;
 import com.sqts.sbvms.Repository.UserRepository;
 import com.sqts.sbvms.Repository.VendorRepository;
@@ -23,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -38,20 +37,24 @@ public class AuthService {
     private final VendorServiceRepository vendorServiceRepository;
     private final JwtService jwtService;
     private final VendorRepository vendorRepository;
+    private final FileStorageService fileStorageService;
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        AuthenticationManager authenticationManager,
                        JwtService jwtService,
                        VendorRepository vendorRepository,
                        ServiceCategoryRepository serviceCategoryRepository,
-                       VendorServiceRepository vendorServiceRepository){
-        this.userRepository =  userRepository;
+                       VendorServiceRepository vendorServiceRepository,
+                       FileStorageService fileStorageService){
+
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.vendorRepository = vendorRepository;
         this.serviceCategoryRepository = serviceCategoryRepository;
         this.vendorServiceRepository = vendorServiceRepository;
+        this.fileStorageService = fileStorageService;
     }
     public String register(RegisterRequest request){
         User user = userRepository.findByEmail(request.getEmail());
@@ -98,7 +101,9 @@ public class AuthService {
 
         return jwtService.generateToken(userDetails);
     }
-    public VendorRegistrationResponse registerVendor(VendorRegistrationRequest request) {
+    public VendorRegistrationResponse registerVendor(
+            VendorRegistrationMultipartRequest request) {
+
         if (request == null)
             throw new InvalidInputException("Please fill all the details.");
 
@@ -125,26 +130,48 @@ public class AuthService {
 
         userRepository.save(user);
 
+        Address address = new Address();
+        address.setAddressLine1(request.getAddressLine1());
+        address.setAddressLine2(request.getAddressLine2());
+        address.setCity(request.getCity());
+        address.setState(request.getState());
+        address.setPincode(request.getPincode());
+
         Vendor vendor = new Vendor();
         vendor.setUser(user);
         vendor.setStatus(VendorStatus.PENDING_APPROVAL);
-        vendor.setVendorAddress(request.getVendorAddress());
+        vendor.setVendorAddress(address);
         vendor.setExperienceYears(request.getExperienceYears());
         vendor.setDescription(request.getDescription());
         vendor.setPhoneNumber(request.getPhoneNumber().trim());
-        vendor.setAadhaarNumber(request.getAadhaarNumber());
-        vendor.setAadhaarFrontImage(request.getAadhaarFrontImage());
-        vendor.setAadhaarBackImage(request.getAadhaarBackImage());
-        vendor.setVerificationDocument(request.getVerificationDocument());
+        vendor.setAadhaarNumber(request.getAadhaarNumber().trim());
+
+        // Upload documents to Cloudinary
+        vendor.setAadhaarFrontImage(
+                fileStorageService.uploadFile(
+                        request.getAadhaarFrontImage(),
+                        "vendor-documents/aadhaar-front"));
+
+        vendor.setAadhaarBackImage(
+                fileStorageService.uploadFile(
+                        request.getAadhaarBackImage(),
+                        "vendor-documents/aadhaar-back"));
+
+        vendor.setVerificationDocument(
+                fileStorageService.uploadFile(
+                        request.getVerificationDocument(),
+                        "vendor-documents/verification"));
 
         vendorRepository.save(vendor);
 
-        ServiceCategory serviceCategory = serviceCategoryRepository
-                .findById(request.getService().getServiceCategoryId())
-                .orElseThrow(() ->
-                        new ServiceNotFoundException("Service not found."));
+        ServiceCategory serviceCategory =
+                serviceCategoryRepository.findById(
+                                request.getServiceCategoryId())
+                        .orElseThrow(() ->
+                                new ServiceNotFoundException(
+                                        "Service not found."));
 
-        String durationText = request.getService().getDuration().trim();
+        String durationText = request.getDuration().trim();
 
         Duration duration;
 
@@ -161,21 +188,22 @@ public class AuthService {
                     "Duration must be in HH:mm format (e.g. 02:30).");
         }
 
-        if (duration.isZero()) {
+        if (duration.isZero())
             throw new InvalidDurationException(
                     "Duration must be greater than zero.");
-        }
 
         VendorService vendorService = new VendorService();
 
         vendorService.setVendor(vendor);
         vendorService.setServiceCategory(serviceCategory);
-        vendorService.setPrice(request.getService().getPrice());
+        vendorService.setPrice(request.getPrice());
         vendorService.setDuration(duration);
 
         vendorServiceRepository.save(vendorService);
 
-        VendorRegistrationResponse response = new VendorRegistrationResponse();
+        VendorRegistrationResponse response =
+                new VendorRegistrationResponse();
+
         response.setVendorId(vendor.getId());
         response.setVendorName(user.getName());
         response.setStatus(vendor.getStatus());

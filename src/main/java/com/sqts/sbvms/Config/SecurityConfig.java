@@ -33,7 +33,7 @@ public class SecurityConfig {
                                                    JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/auth/register", "/auth/login", "/vendor/register", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                    .requestMatchers("/auth/register", "/auth/login", "/vendor/register", "/swagger-ui/**", "/v3/api-docs/**", "/test/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/services").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_VENDOR", "ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/services/*").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_VENDOR", "ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/services/*/vendors").hasAuthority("ROLE_ADMIN")

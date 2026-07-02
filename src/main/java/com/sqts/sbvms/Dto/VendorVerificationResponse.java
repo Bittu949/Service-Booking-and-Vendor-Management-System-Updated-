@@ -74,20 +74,20 @@ public class VendorVerificationResponse {
     private String aadhaarNumber;
 
     @Schema(
-            description = "URL or path of the uploaded Aadhaar front image.",
-            example = "aadhaar_front.jpg"
+            description = "Public URL of the uploaded Aadhaar front image. Open this URL in a browser to view the document.",
+            example = "https://res.cloudinary.com/your-cloud/image/upload/v1782992382/vendor-documents/aadhaar-front/3b0c2f6d-7e81-4f9d-8f8c-9b3f2a1d5abc.jpg"
     )
     private String aadhaarFrontImage;
 
     @Schema(
-            description = "URL or path of the uploaded Aadhaar back image.",
-            example = "aadhaar_back.jpg"
+            description = "Public URL of the uploaded Aadhaar back image. Open this URL in a browser to view the document.",
+            example = "https://res.cloudinary.com/your-cloud/image/upload/v1782992382/vendor-documents/aadhaar-back/7f92d3a8-1d45-4b9d-a5f3-8c4d9b1e2def.jpg"
     )
     private String aadhaarBackImage;
 
     @Schema(
-            description = "URL or path of the uploaded verification document.",
-            example = "electrician_license.pdf"
+            description = "Public URL of the uploaded vendor verification document. Open this URL in a browser to view the uploaded document (image or PDF).",
+            example = "https://res.cloudinary.com/your-cloud/image/upload/v1782992382/vendor-documents/verification/9a7b5c4d-8f21-4b7e-bd93-4d1f2c8e7abc.pdf"
     )
     private String verificationDocument;
 
