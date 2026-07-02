@@ -691,32 +691,60 @@ public class BookingService {
 
         return responses;
     }
-    public List<BookingHistoryResponse> getFilteredBookings(
+    public List<AdminBookingHistoryResponse> getFilteredBookings(
             BookingStatus bookingStatus,
             LocalDate bookingDate) {
 
         List<Booking> bookings = bookingRepository.findAll();
 
-        List<BookingHistoryResponse> allBookings =
-                new ArrayList<>();
-
-        // Filter bookings by status
-        if (bookingStatus != null)
+        // Filter by booking status
+        if (bookingStatus != null) {
             bookings = bookings.stream()
                     .filter(b -> b.getStatus() == bookingStatus)
                     .toList();
+        }
 
-        // Filter bookings by date
-        if (bookingDate != null)
+        // Filter by booking date
+        if (bookingDate != null) {
             bookings = bookings.stream()
                     .filter(b -> b.getBookingDate().equals(bookingDate))
                     .toList();
+        }
+
+        List<AdminBookingHistoryResponse> responses =
+                new ArrayList<>();
 
         for (Booking booking : bookings) {
 
-            BookingHistoryResponse response =
-                    new BookingHistoryResponse();
+            AdminBookingHistoryResponse response =
+                    new AdminBookingHistoryResponse();
 
+            // Booking Details
+            response.setBookingId(booking.getId());
+            response.setBookingDate(booking.getBookingDate());
+            response.setBookingStatus(booking.getStatus());
+            response.setStartTime(booking.getTimeSlot().getStartTime());
+            response.setEndTime(booking.getTimeSlot().getEndTime());
+            response.setServiceName(
+                    booking.getServiceCategory().getServiceName());
+            response.setBookingAddress(
+                    booking.getBookingAddress());
+
+            // Customer Details
+            response.setCustomerId(
+                    booking.getUser().getId());
+            response.setCustomerName(
+                    booking.getUser().getName());
+            response.setCustomerEmail(
+                    booking.getUser().getEmail());
+
+            // Booking Timeline
+            response.setAssignedAt(
+                    booking.getAssignedAt());
+            response.setCompletedAt(
+                    booking.getCompletedAt());
+
+            // Vendor Details (if assigned)
             VendorService vendorService = booking.getVendorService();
 
             if (vendorService != null) {
@@ -725,8 +753,11 @@ public class BookingService {
 
                 response.setVendorId(vendor.getId());
                 response.setVendorName(vendor.getUser().getName());
+                response.setVendorEmail(vendor.getUser().getEmail());
                 response.setVendorAddress(vendor.getVendorAddress());
-                response.setFinalPrice(booking.getFinalPrice());
+
+                response.setFinalPrice(
+                        booking.getFinalPrice());
 
                 if (booking.getEstimatedDuration() != null) {
 
@@ -738,27 +769,12 @@ public class BookingService {
                             )
                     );
                 }
-
-                response.setAssignedAt(booking.getAssignedAt());
-                response.setCompletedAt(booking.getCompletedAt());
             }
 
-            response.setBookingId(booking.getId());
-            response.setBookingStatus(booking.getStatus());
-            response.setBookingDate(booking.getBookingDate());
-            response.setServiceName(
-                    booking.getServiceCategory().getServiceName());
-            response.setStartTime(
-                    booking.getTimeSlot().getStartTime());
-            response.setEndTime(
-                    booking.getTimeSlot().getEndTime());
-            response.setBookingAddress(
-                    booking.getBookingAddress());
-
-            allBookings.add(response);
+            responses.add(response);
         }
 
-        return allBookings;
+        return responses;
     }
     public Long getBookingsCount(){
         return bookingRepository.count();

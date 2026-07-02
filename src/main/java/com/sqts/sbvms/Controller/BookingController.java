@@ -355,7 +355,7 @@ public class BookingController {
             )
     })
     @GetMapping("/bookings")
-    public ResponseEntity<ApiResponse<List<BookingHistoryResponse>>> getFilteredBookings(
+    public ResponseEntity<ApiResponse<List<AdminBookingHistoryResponse>>> getFilteredBookings(
 
             @Parameter(
                     description = "Booking status (PENDING, CONFIRMED, IN_PROGRESS, COMPLETED or CANCELLED)",
@@ -371,7 +371,7 @@ public class BookingController {
             @RequestParam(name = "date", required = false)
             LocalDate bookingDate) {
 
-        List<BookingHistoryResponse> bookings =
+        List<AdminBookingHistoryResponse> bookings =
                 bookingService.getFilteredBookings(
                         bookingStatus,
                         bookingDate);
